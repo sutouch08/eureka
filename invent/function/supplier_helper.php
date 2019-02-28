@@ -5,9 +5,12 @@ function getSuplierIn($txt)
   $qr = "SELECT id FROM tbl_supplier WHERE code LIKE '%".$txt."%' OR name LIKE '%".$txt."%' ";
   $qs = dbQuery($qr);
 
-  while($rs = dbFetchObject($qs))
+  if(dbNumRows($qs) > 0)
   {
-    $in .= ', '.$rs->id;
+    while($rs = dbFetchObject($qs))
+    {
+      $in .= ', '.$rs->id;
+    }
   }
 
   return $in;
@@ -17,12 +20,15 @@ function getSuplierIn($txt)
 function getPoInBySupplierIn($id_supplier_in)
 {
   $in = '0';
-  $qr = "SELECT id_po FROM tbl_po WHERE id_supplier IN(".$id_suupplier_in.")";
+  $qr = "SELECT id_po FROM tbl_po WHERE id_supplier IN(".$id_supplier_in.")";
   $qs = dbQuery($qr);
 
-  while($rs = dbFetchObject($qs))
+  if(dbNumRows($qs) > 0)
   {
-    $in .= ', '.$rs->id_po;
+    while($rs = dbFetchObject($qs))
+    {
+      $in .= ', '.$rs->id_po;
+    }
   }
 
   return $in;

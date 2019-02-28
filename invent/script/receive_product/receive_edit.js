@@ -2,7 +2,9 @@ function saveEdit(){
   var id = $('#id_receive_product').val();
   var id_po = $('#id_po').val();
   var id_zone = $('#id_zone').val();
-  var max = $('.receive-box').length;
+  var unSaveItem = $('.receive-box').length; //--- รายการที่ยังไม่บันทึก
+  var savedItem = $('.received-item').length;
+  var max = unSaveItem + savedItem;
 
   if(isNaN(parseInt(id_zone))){
     swal("โซนไม่ถูกต้อง");
@@ -10,9 +12,13 @@ function saveEdit(){
   }
 
   if(max > 0){
+
     $('#btn-save').attr('disabled', 'disabled');
+
     $('#btn-change-zone').attr('disabled', 'disabled');
+
     load_in();
+
     $('.receive-box').each(function(index){
       let arr = $(this).attr('id').split('-');
       let id_pa = arr[1];
@@ -20,11 +26,52 @@ function saveEdit(){
         return false;
       }
     });
+
     load_out();
 
     review();
   }
 }
+
+
+
+
+
+function updateReceiveProduct(){
+  var id = $('#id_receive_product').val();
+  var id_po = $('#id_po').val();
+  var po  = $('#po').val();
+  var remark = $('#remark').val();
+  var invoice = $('#invoice').val();
+  var date_add = $('#date_add').val();
+  $.ajax({
+    url:'controller/receiveProductController.php?updateReceiveProduct',
+    type:'POST',
+    cache:false,
+    data:{
+      'id_receive_product' : id,
+      'date_add' : date_add,
+      'id_po' : id_po,
+      'po_reference' : po,
+      'invoice' : invoice,
+      'remark' : remark
+    },
+    success:function(rs){
+      var rs = $.trim(rs);
+      if(rs == 'success'){
+        $('#date_add').attr('disabled', 'disabled');
+        $('#po').attr('disabled', 'disabled');
+        $('#invoice').attr('disabled', 'disabled');
+        $('#remark').attr('disabled', 'disabled');
+        $('#btn-get-po').attr('disabled', 'disabled');
+        $('#btn-edit').removeClass('hide');
+        $('#btn-save-edit').addClass('hide');
+      }
+    }
+  });
+}
+
+
 
 
 function receiveItem(id, id_po, id_zone, id_pa){
@@ -90,4 +137,67 @@ $('.receive-box').keyup(function(){
 function deleteRow(id){
   $('#row-'+id).remove();
   updateNo();
+}
+
+
+function getEdit(){
+  $('#date_add').removeAttr('disabled');
+  $('#po').removeAttr('disabled');
+  $('#btn-get-po').removeAttr('disabled');
+  $('#invoice').removeAttr('disabled');
+  $('#remark').removeAttr('disabled');
+  $('#btn-edit').addClass('hide');
+  $('#btn-save-edit').removeClass('hide');
+}
+
+
+function getPO(){
+  var id_po = $('#id_po').val();
+  var received = $('.received-item').length;
+
+  if(id_po == ''){
+    return false;
+  }
+
+  if(received > 0){
+    swal({
+      title:'Warning',
+      text:'ไม่สามารถดึงรายการได้เนื่องจากมีรายการที่เก่าค้างอยู่ กรุณาลบรายการที่ค้างอยู่ก่อนดึงใหม่อีกครั้ง',
+      type:'warning'
+    });
+
+    return false;
+  }
+
+  load_in();
+
+  $.ajax({
+    url:'controller/receiveProductController.php?getPoDetail',
+    type:'GET',
+    cache:false,
+    data:{
+      'id_po' : id_po
+    },
+    success:function(rs){
+      load_out();
+      var rs = $.trim(rs);
+      if(isJson(rs))
+      {
+        $('#pre_label').remove();
+        var source = $('#row-template').html();
+        var data = $.parseJSON(rs);
+        var output = $('#result');
+
+        render(source, data, output);
+
+      }else{
+        swal({
+          title:'Error!',
+          text:rs,
+          type:'error'
+        });
+      }
+    }
+  });
+
 }

@@ -26,6 +26,9 @@ public function __construct($id = "")
 	}
 }
 
+
+
+
 public function check_reference($reference, $id_po = "")
 {
 	if($id_po != "")
@@ -38,6 +41,21 @@ public function check_reference($reference, $id_po = "")
 	}
 	return dbNumRows($qs);
 }
+
+
+
+
+public function isClosed($id_po)
+{
+	$qs = dbQuery("SELECT valid FROM tbl_po WHERE id_po = ".$id_po." AND valid = 1");
+	if(dbNumRows($qs) == 1)
+	{
+		return TRUE; //--- Po closed
+	}
+
+	return FALSE;
+}
+
 
 public function cancle_close($id_po)
 {
@@ -56,6 +74,24 @@ public function cancle_close($id_po)
 	}
 }
 
+
+
+public function unClosePO($id_po)
+{
+	return dbQuery("UPDATE tbl_po SET valid = 0 WHERE id_po = ".$id_po);
+}
+
+
+public function unCloseDetail($id_po)
+{
+	return dbQuery("UPDATE tbl_po_detail SET valid = 0 WHERE id_po = ".$id_po);
+}
+
+
+
+
+
+
 public function close_po($id_po)
 {
 	startTransection();
@@ -73,20 +109,35 @@ public function close_po($id_po)
 	}
 }
 
+
+
+
+
 public function delete_po($id_po)
 {
 	return dbQuery("DELETE FROM tbl_po WHERE id_po = ".$id_po);
 }
+
+
+
+
+
 
 public function drop_all_detail($id_po)
 {
 	return dbQuery("DELETE FROM tbl_po_detail WHERE id_po = ".$id_po);
 }
 
+
+
+
 public function drop_detail($id_po_detail)
 {
 	return dbQuery("DELETE FROM tbl_po_detail WHERE id_po_detail = ".$id_po_detail);
 }
+
+
+
 
 public function drop_different($id_po, array $detail)
 {
@@ -124,6 +175,9 @@ public function drop_different($id_po, array $detail)
 	}
 }
 
+
+
+
 public function get_detail($id_po)
 {
 	$qs = "SELECT id_po_detail, id_po, tbl_po_detail.id_product, tbl_po_detail.id_product_attribute, reference, tbl_po_detail.price, qty, discount_percent, discount_amount, total_discount, total_amount, tbl_po_detail.date_upd, received, valid";
@@ -133,6 +187,9 @@ public function get_detail($id_po)
 	$qs = dbQuery($qs);
 	return $qs;
 }
+
+
+
 
 
 public function getPoBacklog($id_po)
@@ -147,6 +204,11 @@ public function getPoBacklog($id_po)
 
 	return dbQuery($qr);
 }
+
+
+
+
+
 
 public function add_item(array $data)
 {
@@ -172,15 +234,26 @@ public function add_item(array $data)
 	}
 }
 
+
+
+
+
 public function get_items($id)
 {
 	return dbQuery("SELECT * FROM tbl_po_detail WHERE id_po = ".$id);
 }
 
+
+
+
 public function get_item($id)
 {
 	return dbFetchArray( dbQuery("SELECT * FROM tbl_po_detail WHERE id_po_detail = ".$id." LIMIT 1") );
 }
+
+
+
+
 
 public function add(array $data)
 {
@@ -195,11 +268,18 @@ public function add(array $data)
 	}
 }
 
+
+
+
 public function update($id, array $data)
 {
 	$qs = dbQuery("UPDATE tbl_po SET reference = '".$data['reference']."', id_supplier = ".$data['id_supplier'].", id_employee = ".$data['id_employee'].", due_date = '".$data['due_date']."', date_add = '".$data['date_add']."', remark = '".$data['remark']."', role = ".$data['role']." WHERE id_po = ".$id);
 	return $qs;
 }
+
+
+
+
 
 public function update_bill_discount($id, $discount)
 {
@@ -207,11 +287,17 @@ public function update_bill_discount($id, $discount)
 	return $qs;
 }
 
+
+
+
 public function update_status($id, $status)
 {
 	$qs = dbQuery("UPDATE tbl_po SET status = ".$status." WHERE id_po = ".$id);
 	return $qs;
 }
+
+
+
 
 public function getDiscount($d_percent, $d_amount)
 {
@@ -230,6 +316,9 @@ public function getDiscount($d_percent, $d_amount)
 	return $discount;
 }
 
+
+
+
 public function total_qty($id)
 {
 	$qty = 0;
@@ -240,6 +329,10 @@ public function total_qty($id)
 	}
 	return $qty;
 }
+
+
+
+
 
 public function po_received_qty($id_po)
 {
@@ -252,10 +345,17 @@ public function po_received_qty($id_po)
 	return $qty;
 }
 
+
+
+
 public function receive_item($id_po, $id_product_attribute, $qty)
 {
 	return dbQuery("UPDATE tbl_po_detail SET received = received + ".$qty." WHERE id_po = ".$id_po." AND id_product_attribute = ".$id_product_attribute);
 }
+
+
+
+
 
 public function supplier_code($id)
 {
@@ -268,6 +368,9 @@ public function supplier_code($id)
 	return $code;
 }
 
+
+
+
 public function supplier_name($id)
 {
 	$name = "";
@@ -278,6 +381,9 @@ public function supplier_name($id)
 	}
 	return $name;
 }
+
+
+
 
 public function get_id_po_by_reference($reference)
 {
@@ -291,6 +397,8 @@ public function get_id_po_by_reference($reference)
 }
 
 
+
+
 public function getDetailByItem($id_po, $id_pa)
 {
 	$qr = "SELECT * FROM tbl_po_detail WHERE id_po = ".$id_po." AND id_product_attribute = ".$id_pa;
@@ -300,7 +408,7 @@ public function getDetailByItem($id_po, $id_pa)
 		return dbFetchObject($qs);
 	}
 
-	return FALSE;	
+	return FALSE;
 }
 
 

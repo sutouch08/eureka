@@ -25,19 +25,19 @@ $toDate   = getFilter('toDate', 'toDate', '');
   <div class="row">
     <div class="col-sm-2 padding-5 first">
       <label>เอกสาร</label>
-      <input type="text" class="form-control input-sm text-center" name="sCode" id="sCode" value="<?php echo $sCode; ?>" />
+      <input type="text" class="form-control input-sm text-center search-box" name="sCode" id="sCode" value="<?php echo $sCode; ?>" />
     </div>
     <div class="col-sm-2 padding-5">
       <label>ใบส่งสินค้า</label>
-      <input type="text" class="form-control input-sm text-center" name="sInvoice" id="sInvoice" value="<?php echo $sInvoice; ?>" />
+      <input type="text" class="form-control input-sm text-center search-box" name="sInvoice" id="sInvoice" value="<?php echo $sInvoice; ?>" />
     </div>
     <div class="col-sm-2 padding-5">
       <label>ใบสั่งซื้อ</label>
-      <input type="text" class="form-control input-sm text-center" name="sPo" id="sPo" value="<?php echo $sPo; ?>" />
+      <input type="text" class="form-control input-sm text-center search-box" name="sPo" id="sPo" value="<?php echo $sPo; ?>" />
     </div>
     <div class="col-sm-2 padding-5">
       <label>ผู้ขาย</label>
-      <input type="text" class="form-control input-sm text-center" name="sSup" id="sSup" value="<?php echo $sSup; ?>" />
+      <input type="text" class="form-control input-sm text-center search-box" name="sSup" id="sSup" value="<?php echo $sSup; ?>" />
     </div>
     <div class="col-sm-2 padding-5">
       <label class="display-block">วันที่</label>
@@ -62,7 +62,7 @@ createCookie('sCode', $sCode);
 createCookie('sInvoice', $sInvoice);
 createCookie('sPo', $sPo);
 createCookie('sSup', $sSup);
-if(($fromDate = "" && $toDate = "") || ($fromDate != "" && $toDate != ""))
+if(($fromDate == "" && $toDate == "") || ($fromDate != "" && $toDate != ""))
 {
   createCookie('fromDate', $fromDate);
   createCookie('toDate', $toDate);
@@ -90,7 +90,7 @@ if($sSup != "")
   $where .= "AND id_po IN(".$poIn.") ";
 }
 
-if($fromDate !== "" && $toDate !== "")
+if($fromDate != "" && $toDate != "")
 {
   $where .= "AND date_add >= '".fromDate($fromDate)."' ";
   $where .= "AND date_add <= '".toDate($toDate)."' ";
@@ -128,7 +128,7 @@ $qs = dbQuery($qr);
     <?php   $no = row_no(); ?>
     <?php   while($rs = dbFetchObject($qs)) : ?>
       <tr class="font-size-12" id="row-<?php echo $rs->id_receive_product; ?>">
-        <td class="middle text-center"><?php echo $no; ?></td>
+        <td class="middle text-center no"><?php echo $no; ?></td>
         <td class="middle"><?php echo thaiDate($rs->date_add); ?></td>
         <td class="middle"><?php echo $rs->reference; ?></td>
         <td class="middle"><?php echo $rs->invoice; ?></td>
@@ -168,16 +168,3 @@ $qs = dbQuery($qr);
 
 
 </div><!--/ container -->
-<script>
-function clearFilter()
-{
-	$.ajax({
-		url:"controller/receiveProductController.php?clear_filter",
-		type:"GET",
-    cache: "false",
-    success: function(rs){
-			window.location.href="index.php?content=receive_product";
-		}
-	});
-}
-</script>

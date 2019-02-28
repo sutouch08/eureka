@@ -14,6 +14,12 @@ $('#toDate').datepicker({
 });
 
 
+$('.search-box').keyup(function(e){
+  if(e.keyCode == 13){
+    getSearch();
+  }
+});
+
 function getSearch(){
   var sCode     = $('#sCode').val();
   var sInvoice  = $('#sInvoice').val();
@@ -71,14 +77,17 @@ function getDelete(id, reference){
         var rs = $.trim(rs);
 				if( rs == 'success' ){
           load_out();
-					swal({
-            title:'Deleted',
-            text: 'ลบเอกสารเรียบร้อยแล้ว',
-            type: 'success',
-            timer: 1000
-          });
+          $("#row-"+id).remove();
+          updateNo();
+          setTimeout(function(){
+            swal({
+              title:'Deleted',
+              text: 'ลบเอกสารเรียบร้อยแล้ว',
+              type: 'success',
+              timer: 1500
+            });
+          }, 500);
 
-					$("#row-"+id).remove();
 				}else{
 					swal("ข้อผิดพลาด", rs, "error");
 				}
@@ -113,4 +122,13 @@ function printReceived(id)
   var prop 			= "width=800, height=900. left="+center+", scrollbars=yes";
   var target = 'controller/receiveProductController.php?print&id_receive_product='+id;
 	window.open(target, "_blank", prop);
+}
+
+
+
+
+function clearFilter(){
+  $.get('controller/receiveProductController.php?clearFilter', function(){
+    goBack();
+  });
 }

@@ -20,23 +20,23 @@ $qs = $ro->getDetails($id);
 <div class="row">
   <div class="col-sm-1 col-1-harf padding-5 first">
     <label>วันที่</label>
-    <input type="text" class="form-control input-sm text-center" value="<?php echo thaiDate($ro->date_add); ?>" readonly />
+    <input type="text" class="form-control input-sm text-center" value="<?php echo thaiDate($ro->date_add); ?>" disabled />
   </div>
   <div class="col-sm-2 padding-5">
     <label>เลขที่เอกสาร</label>
-    <input type="text" class="form-control input-sm text-center" value="<?php echo $ro->reference; ?>" readonly />
+    <input type="text" class="form-control input-sm text-center" value="<?php echo $ro->reference; ?>" disabled />
   </div>
   <div class="col-sm-2 padding-5">
     <label>เลขที่บิล</label>
-    <input type="text" class="form-control input-sm text-center" value="<?php echo $ro->order_code; ?>" readonly />
+    <input type="text" class="form-control input-sm text-center" value="<?php echo $ro->order_code; ?>" disabled />
   </div>
   <div class="col-sm-2 padding-5">
     <label>ลูกค้า</label>
-    <input type="text" class="form-control input-sm" value="<?php echo $cs->getFullName($ro->id_customer); ?>" readonly />
+    <input type="text" class="form-control input-sm" value="<?php echo $cs->getFullName($ro->id_customer); ?>" disabled />
   </div>
   <div class="col-sm-4 col-4-harf padding-5 last">
     <label>หมายเหตุ</label>
-    <input type="text" class="form-control input-sm" value="<?php echo $ro->remark; ?>" readonly />
+    <input type="text" class="form-control input-sm" value="<?php echo $ro->remark; ?>" disabled />
   </div>
   <input type="hidden" id="id_return_order" value="<?php echo $ro->id; ?>" />
 </div>

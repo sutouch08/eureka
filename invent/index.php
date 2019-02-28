@@ -28,7 +28,7 @@ switch($page){
 			break;
 		case "order_return":
 			$content = "order_return.php";
-			$pageTitle = "รับคืนสินค้า(ปัจจุบัน)";
+			$pageTitle = "รับคืนสินค้า(ลดหนี้ขาย)";
 			break;
 		case "order_return2":
 			$content = "order_return2.php";
@@ -54,7 +54,7 @@ switch($page){
 			$content = 'stock.php';
 			$pageTitle = 'Stock';
 			break;
-			
+
 		//-- ปิดการใช้งานไว้ก่อน ใช้ order_transform แทน
 		case "requisition";
 			$content = "requisition.php";

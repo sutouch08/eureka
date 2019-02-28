@@ -90,7 +90,7 @@ public function getDetail($id_pa)
 {
 	$qr = "SELECT pa.*, pd.product_name ";
 	$qr .= "FROM tbl_product_attribute AS pa ";
-	$qr .= "JOIN tbl_product AS pd ON pa.id_product = pa.id_product ";
+	$qr .= "JOIN tbl_product AS pd ON pa.id_product = pd.id_product ";
 	$qr .= "WHERE id_product_attribute = ".$id_pa;
 	$qs = dbQuery($qr);
 

@@ -4,12 +4,9 @@ $id = $_GET['id'];
 
 $cs 		  = new return_order($id);
 
-$barcode  = new barcode();
 $product  = new product();
 $print 		= new printer();
 $customer = new customer($cs->id_customer);
-$zone     = new zone();
-$wh       = new warehouse();
 $emp      = new employee($cs->id_employee);
 
 
@@ -20,7 +17,7 @@ $print->add_title('รับคืนสินค้า(ลดหนี้ขา
 $header			= array(
             "เลขที่เอกสาร" => $cs->reference,
             "วันที่เอกสาร" => thaiDate($cs->date_add),
-            "ลูกค้า" => $sup->name,
+            "ลูกค้า" => ($customer->company == "" ? $customer->full_name : $customer->company),
             "พนักงาน"	=> $emp->first_name,
             "อ้างอิง" => $cs->order_code
             );
@@ -64,11 +61,11 @@ $print->add_subheader($thead);
 //***************************** กำหนด css ของ td *****************************//
 $pattern = array(
             "text-align: center; border-top:0px;",
-            "border-left: solid 1px #ccc; border-top:0px;",
-            "border-left: solid 1px #ccc; border-top:0px;",
-            "border-left: solid 1px #ccc; border-top:0px;",
-            "border-left: solid 1px #ccc; border-top:0px;",
-            "text-align:center; border-left: solid 1px #ccc; border-top:0px;"
+            "border-left:solid 1px #ccc; border-top:0px;",
+            "text-align:right; border-left: solid 1px #ccc; border-top:0px;",
+            "text-align:right; border-left:solid 1px #ccc; border-top:0px;",
+            "text-align:right; border-left:solid 1px #ccc; border-top:0px;",
+            "text-align:right; border-left: solid 1px #ccc; border-top:0px;"
             );
 
 $print->set_pattern($pattern);
@@ -102,10 +99,11 @@ while($total_page > 0 )
     if( ! empty($rs) )
     {
       $pd = $product->getDetail($rs->id_product_attribute);
+      $barcode = '<img src="'.WEB_ROOT.'library/class/barcode.php?text='.$pd->barcode.'" style="height:8mm;" />';
       //--- เตรียมข้อมูลไว้เพิ่มลงตาราง
       $data = array(
                     $n,
-                    $barcode->getBarcode($rs->id_product_attribute),
+                    $barcode,
                     inputRow($rs->product_code.' : '.$pd->product_name), //--- print_helper
                     number($rs->price,2),
                     number($rs->qty),

@@ -23,7 +23,7 @@
       <p class="pull-right top-p">
         <button type="button" class="btn btn-sm btn-warning" onclick="goBack()"><i class="fa fa-arrow-left"></i> กลับ</button>
         <?php if($rd->status == 0) : ?>
-          <button type="button" class="btn btn-sm btn-success" id="btn-save" disabled onclick="saveAdd()"><i class="fa fa-save"></i> บันทึก</button>
+          <button type="button" class="btn btn-sm btn-success" id="btn-save" disabled onclick="saveEdit()"><i class="fa fa-save"></i> ตรวจสอบ</button>
         <?php endif; ?>
       </p>
     </div>
@@ -39,11 +39,15 @@
       <label>วันที่</label>
       <input type="text" class="form-control input-sm text-center" id="date_add" value="<?php echo thaiDate($rd->date_add); ?>" disabled />
     </div>
-    <div class="col-sm-2 padding-5">
+    <div class="col-sm-1 col-1-harf padding-5">
       <label class="display-block">ใบสั่งซื้อ</label>
       <input type="text" class="form-control input-sm text-center" id="po" value="<?php echo $rd->po_reference; ?>" disabled />
     </div>
-    <div class="col-sm-2 padding-5">
+    <div class="col-sm-1 padding-5">
+      <label class="display-block not-show">ดึงข้อมูล</label>
+      <button type="button" class="btn btn-sm btn-info btn-block" id="btn-get-po" onclick="getPO()" disabled>ดึงข้อมูล</button>
+    </div>
+    <div class="col-sm-1 col-1-harf padding-5">
       <label class="display-block">ใบส่งสินค้า</label>
       <input type="text" class="form-control input-sm text-center" id="invoice" value="<?php echo $rd->invoice; ?>" disabled />
     </div>
@@ -53,10 +57,11 @@
     </div>
 
     <?php if($rd->status == 0) : ?>
-    <div class="col-sm-1 padding-5 last">
-      <label class="display-block not-show">แก้ไข</label>
-      <button type="button" class="btn btn-sm btn-warning btn-block" onclick="getEdit()"><i class="fa fa-pencil"></i> แก้ไข</button>
-    </div>
+      <div class="col-sm-1 padding-5 last">
+        <label class="display-block not-show">แก้ไข</label>
+        <button type="button" class="btn btn-sm btn-warning btn-block" id="btn-edit" onclick="getEdit()"><i class="fa fa-pencil"></i> แก้ไข</button>
+        <button type="button" class="btn btn-sm btn-success btn-block hide" id="btn-save-edit" onclick="updateReceiveProduct()"><i class="fa fa-save"></i> Update</button>
+      </div>
     <?php endif; ?>
 
     <input type="hidden" id="id_receive_product" value="<?php echo $rd->id_receive_product; ?>" />
@@ -81,7 +86,7 @@
           <th class="width-10 text-center">รับ</th>
           <th class="width-5 text-center">Actions</th>
         </thead>
-        <tbody>
+        <tbody id="result">
           <?php  if(dbNumRows($qs) > 0) : ?>
             <?php $no = 1; ?>
             <?php while($rs = dbFetchObject($qs)) : ?>
@@ -122,5 +127,8 @@
   <?php endif; ?>
 </div><!--/ container -->
 
+<?php include 'include/receive_product/receive_template.php'; ?>
+
 <script src="script/receive_product/receive_add.js?token=<?php echo date('YmdH'); ?>"></script>
+<script src="script/receive_product/receive_edit.js?token=<?php echo date('YmdH'); ?>"></script>
 <script src="script/receive_product/receive_control.js?token=<?php echo date('YmdH'); ?>"></script>

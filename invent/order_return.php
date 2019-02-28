@@ -28,3 +28,4 @@
 
 </div><!--/ container -->
 <script src="script/return_order/return_order.js?token=<?php echo date('Ymd'); ?>"></script>
+<script src="script/return_order/return_add.js?token=<?php echo date('Ymd'); ?>"></script>

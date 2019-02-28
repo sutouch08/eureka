@@ -4,6 +4,173 @@ require "../../library/functions.php";
 require "../function/tools.php";
 
 /*********************   New Code ***********************/
+
+//////////////// ลบเอกสาร /////////////////
+if( isset( $_GET['delete_doc'] ) && isset( $_GET['id_receive_product'] ) )
+{
+	$id = $_GET['id_receive_product'];
+	$sc = TRUE;
+	$rd	= new receive_product($id);
+
+	startTransection();
+
+	//--- รายการทั้งหมดใน เอกสารนี้
+	$qs = $rd->get_items($id);
+
+	if(dbNumRows($qs) > 0)
+	{
+		$stock = new stock();
+		$movement = new movement();
+		$po = new po();
+
+		while($rs = dbFetchObject($qs))
+		{
+			//--- check ว่ารายการนี้ บันทึกแล้วหรือยัง
+			if($rd->isSaved($rs->id_receive_product_detail) === TRUE)
+			{
+				//--- delete movement
+				if($movement->dropMoveIn($rd->reference, $rs->id_zone, $rs->id_product_attribute) !== TRUE)
+				{
+					$sc = FALSE;
+					$message = 'ลบ Movement ไม่สำเร็จ';
+				}
+
+				//--- ลดยอดในโซนที่รับเข้า
+				if($stock->updateStockZone($rs->id_zone, $rs->id_product_attribute, $rs->qty * -1) !== TRUE)
+				{
+					$sc = FALSE;
+					$message = 'ตัดยอดจากโซนรับเข้าไม่สำเร็จ';
+				}
+
+				//---- Delete product received item
+				if($rd->delete_item($rs->id_receive_product_detail) !== TRUE)
+				{
+					$sc = FALSE;
+					$message = 'ลบรายการไม่สำเร็จ';
+				}
+
+				//--- Update PO detail received
+				if($po->receive_item($rd->id_po, $rs->id_product_attribute, $rs->qty * -1) !== TRUE)
+				{
+					$sc = FALSE;
+					$message = 'ปรับปรุงยอดรับในใบสั่งซื้อไม่สำเร็จ';
+				}
+
+			}
+			else
+			{
+				if($rd->delete_item($rs->id_receive_product_detail) !== TRUE)
+				{
+					$sc = FALSE;
+					$message = 'ลบรายการไม่สำเร็จ';
+				}
+			} //--- end if saved
+
+		} //--- end while
+
+		if($sc === TRUE)
+		{
+			if($po->isClosed($rd->id_po) === TRUE)
+			{
+				if($po->unCloseDetail($rd->id_po) === FALSE)
+				{
+					$sc = FALSE;
+					$message = 'ย้อนสถานะรายการในใบสั่งซื้อไม่สำเร็จ';
+				}
+
+				if($po->unClosePO($rd->id_po) === FALSE)
+				{
+					$sc = FALSE;
+					$message = 'ย้อนสถานะใบสั่งซื้อไม่สำเร็จ';
+				}
+			}
+		}
+
+	} //--- end if dbNumRows
+
+	if($sc === TRUE)
+	{
+		if($rd->delete($id) !== TRUE)
+		{
+			$sc = FALSE;
+			$message = 'ลบเอกสารไม่สำเร็จ';
+		}
+	}
+
+	if($sc === TRUE)
+	{
+		commitTransection();
+	}
+	else
+	{
+		dbRollback();
+	}
+
+	endTransection();
+
+	echo $sc === TRUE ? 'success' : $message;
+}
+
+
+
+
+if(isset($_GET['updateReceiveProduct']))
+{
+	$id 		= $_POST['id_receive_product'];
+	$ds = array(
+		'invoice' => $_POST['invoice'],
+		'po_reference' => $_POST['po_reference'],
+		'id_po' => $_POST['id_po'],
+		'remark' => $_POST['remark'],
+		'date_add' => dbDate($_POST['date_add']),
+		'id_employee' => getCookie('user_id')
+	);
+
+	$rp = new receive_product();
+
+	$rs = $rp->update($id, $ds);
+
+	echo $rs === TRUE ? 'success' : 'fail';
+
+}
+
+if(isset($_GET['getPoDetail']))
+{
+	$id_po = $_GET['id_po'];
+	$po = new po();
+
+	$qs = $po->getPoBacklog($id_po);
+
+	if(dbNumRows($qs) > 0)
+	{
+		$ds = array();
+		$no = 1;
+		while($rs = dbFetchObject($qs))
+		{
+			$qty = ($rs->qty - $rs->received);
+			$qty = $qty > 0 ? $qty : '';
+			$arr = array(
+				'no' => $no,
+				'id_pd' => $rs->id_product,
+				'id_pa' => $rs->id_product_attribute,
+				'pdCode' => $rs->reference,
+				'pdName' => $rs->product_name,
+				'qty' => $qty
+			);
+			array_push($ds, $arr);
+			$no++;
+		}
+
+		echo json_encode($ds);
+	}
+	else
+	{
+		echo 'No data found !';
+	}
+}
+
+
+
 if(isset($_GET['receiveItems']) && isset($_POST['id_receive_product']))
 {
 	$id_rp = $_POST['id_receive_product'];
@@ -78,6 +245,10 @@ if(isset($_GET['receiveItems']) && isset($_POST['id_receive_product']))
 	echo $sc === TRUE ? 'success' : $message;
 
 }
+
+
+
+
 
 
 if(isset($_GET['receiveItem']) && isset($_POST['id_receive_product']))
@@ -212,6 +383,10 @@ if( isset( $_GET['check_approve'] ) && isset( $_POST['password'] ) )
 }
 
 
+
+
+
+
 if( isset( $_GET['save_edit'] ) && isset( $_POST['id_receive_product'] ) )
 {
 	$rd	= new receive_product();
@@ -236,19 +411,7 @@ if( isset( $_GET['save_add'] ) && isset( $_POST['id_receive_product'] ) )
 	}
 }
 
-//////////////// ลบเอกสาร /////////////////
-if( isset( $_GET['delete_doc'] ) && isset( $_GET['id_receive_product'] ) )
-{
-	$id = $_GET['id_receive_product'];
-	$rd	= new receive_product();
-	$rs 	= $rd->delete_doc($id);
-	if($rs)
-	{
-		echo "success";
-	}else{
-		echo "ลบเอกสารไม่สำเร็จ";
-	}
-}
+
 
 
 
@@ -264,6 +427,10 @@ if( isset( $_GET['delete_item'] ) && isset( $_POST['id_receive_product_detail'] 
 		echo "fali";
 	}
 }
+
+
+
+
 
 
 if( isset( $_GET['sum_item'] ) && isset( $_POST['id_receive_product'] ) )
@@ -347,6 +514,11 @@ if( isset( $_GET['add_item'] ) && isset( $_POST['id_receive_product'] ) )
 	}
 }
 
+
+
+
+
+
 if( isset( $_GET['update'] ) && isset( $_GET['id_receive_product'] ) )
 {
 	$id		= $_GET['id_receive_product'];
@@ -367,6 +539,9 @@ if( isset( $_GET['update'] ) && isset( $_GET['id_receive_product'] ) )
 		echo "fail";
 	}
 }
+
+
+
 
 
 if( isset( $_GET['add_new']) && isset( $_POST['id_po'] ) )
@@ -393,6 +568,9 @@ if( isset( $_GET['add_new']) && isset( $_POST['id_po'] ) )
 
 
 
+
+
+
 if( isset($_GET['get_zone'] ) && isset( $_POST['barcode'] ) )
 {
 	$barcode = trim($_POST['barcode']);
@@ -405,6 +583,11 @@ if( isset($_GET['get_zone'] ) && isset( $_POST['barcode'] ) )
 		echo "fail";
 	}
 }
+
+
+
+
+
 
 if( isset( $_GET['print'] ) && isset( $_GET['id_receive_product'] ) )
 {
@@ -535,13 +718,17 @@ if( isset( $_GET['get_received_product'] ) && isset( $_POST['id_received_product
 }
 
 
-if( isset( $_GET['clear_filter'] ) )
+
+
+if( isset( $_GET['clearFilter'] ) )
 {
-	setcookie("receive_from_date","",time()-3600,"/");
-	setcookie("receive_to_date","",time()-3600,"/");
-	setcookie("receive_filter","",time()-3600,"/");
-	setcookie("receive_search_text","",time()-3600,"/");
-	echo "success";
+	deleteCookie('sCode');
+	deleteCookie('sInvoice');
+	deleteCookie('sPo');
+	deleteCookie('sSup');
+	deleteCookie('fromDate');
+	deleteCookie('toDate');
+	echo 'done';
 }
 
 ?>

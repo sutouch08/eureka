@@ -68,6 +68,18 @@ class order{
 	}
 
 
+	public function getDataByReference($reference)
+	{
+		$qr = "SELECT * FROM tbl_order WHERE reference = '".$reference."'";
+		$qs = dbQuery($qr);
+		if(dbNumRows($qs) == 1)
+		{
+			return dbFetchObject($qs);
+		}
+
+		return FALSE;
+	}
+
 
 
 	public function sold_product(array $ds = array())

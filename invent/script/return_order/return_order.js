@@ -4,6 +4,21 @@ function goBack(){
 
 
 
+function leave(){
+  swal({
+    title:'ยกเลิกข้อมูลนี้ ?',
+    type:'warning',
+    showCancelButton:true,
+    cancelButtonText:'No',
+    confirmButtonText:'Yes',
+    closeOnConfirm:true
+  },function(){
+    goBack();
+  });
+}
+
+
+
 function goAdd(id){
   if(id === undefined){
     window.location.href = 'index.php?content=order_return&add=Y';

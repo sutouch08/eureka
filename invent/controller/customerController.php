@@ -3,10 +3,45 @@ require "../../library/config.php";
 require "../../library/functions.php";
 require "../function/tools.php";
 
+
+if(isset($_GET['getSaleIdByCustomer']))
+{
+	$id = $_GET['id_customer']; //--- id customer
+	$customer = new customer($id);
+	$sale = new sale($customer->id_sale);
+	echo json_encode(array('name' => $sale->full_name));
+}
+
+if(isset($_GET['getCustomer']))
+{
+	$txt = $_REQUEST['term'];
+	$qr  = "SELECT id_customer, first_name, last_name, company ";
+	$qr .= "FROM tbl_customer ";
+	$qr .= "WHERE first_name LIKE '%".$txt."%' ";
+	$qr .= "OR last_name LIKE '%".$txt."%' ";
+	$qr .= "OR company LIKE '%".$txt."%' ";
+
+	$qs = dbQuery($qr);
+	if(dbNumRows($qs) > 0)
+	{
+		$ds = array();
+		while($rs = dbFetchObject($qs))
+		{
+			$ds[] = $rs->first_name.' '.$rs->last_name.' | '.$rs->id_customer;
+		}
+
+		echo json_encode($ds);
+	}
+	else
+	{
+		echo json_encode(array('nodata'));
+	}
+}
+
 //***********************  Auto complete  *****************//
 if( isset($_GET['get_customer']) && isset($_REQUEST['term']) )
 {
-	if( $_REQUEST['term'] =="*" )	
+	if( $_REQUEST['term'] =="*" )
 	{
 		$rs = dbQuery("SELECT id_customer, first_name, last_name FROM tbl_customer");
 	}else{
@@ -31,7 +66,7 @@ if(isset($_GET['add'])){
 	if(isset($_POST['gender'])){ $gender = $_POST['gender'];}else{ $gender = 0; }
 	$birthday = dbDate($_POST['day']."-".$_POST['month']."-".$_POST['year']);
 	$group_checked = $_POST['groupcheck'];
-	$data = array($_POST['customer_code'], $_POST['default_group'], $_POST['id_sale'], $gender, $_POST['company'], $_POST['first_name'], $_POST['last_name'], $_POST['email'], $_POST['password'], $birthday, 
+	$data = array($_POST['customer_code'], $_POST['default_group'], $_POST['id_sale'], $gender, $_POST['company'], $_POST['first_name'], $_POST['last_name'], $_POST['email'], $_POST['password'], $birthday,
 						$_POST['credit_amount'], $_POST['credit_term'], $_POST['active']);
 	$customer = new customer();
 	if($customer->add($data)){
@@ -45,11 +80,11 @@ if(isset($_GET['add'])){
 
 
 //********************************* แก้ไขข้อมูลลูกค้า ******************************************//
- if(isset($_GET['edit'])&&isset($_POST['id_customer'])){	
+ if(isset($_GET['edit'])&&isset($_POST['id_customer'])){
 	if(isset($_POST['gender'])){ $gender = $_POST['gender'];}else{ $gender = 0; }
 	$id_customer = $_POST['id_customer'];
 	$birthday = dbDate($_POST['day']."-".$_POST['month']."-".$_POST['year']);
-	$data = array($id_customer, $_POST['customer_code'], $_POST['default_group'], $_POST['id_sale'], $gender, $_POST['company'], $_POST['first_name'], $_POST['last_name'], $_POST['email'], 
+	$data = array($id_customer, $_POST['customer_code'], $_POST['default_group'], $_POST['id_sale'], $gender, $_POST['company'], $_POST['first_name'], $_POST['last_name'], $_POST['email'],
 	$_POST['password'], $birthday, $_POST['credit_amount'], $_POST['credit_term'], $_POST['active']);
 	$customer = new customer();
 	if($customer->edit($data)){
@@ -71,16 +106,16 @@ if(isset($_GET['add'])){
 					}else{
 						$category = $_POST['category'];
 						foreach($category as $id_category => $discount){
-							$customer->update_discount($id_customer, $id_category, $discount);	
+							$customer->update_discount($id_customer, $id_category, $discount);
 						}
-					}		
+					}
 				}
 			$message = "แก้ไขข้อมูลลูกค้าเรียบร้อยแล้ว";
 			header("location: ../index.php?content=customer&edit=y&id_customer=$id_customer&message=$message");
 	}else{
 		$message = $customer->error_message;
 		header("location: ../index.php?content=customer&edit=y&id_customer=$id_customer&error=$message");
-		exit;	
+		exit;
 	}
 }
 
@@ -111,12 +146,12 @@ if(isset($_GET['get_info'])&&isset($_GET['id_customer'])){
 		<td style='width:50%; padding-left:10px; padding-top:10px; padding-bottom:10px; vertical-align:middle;'>อีเมล์ :&nbsp;".$customer->email."</td>
 		<td style='width:50%; padding-left:10px; padding-top:10px; padding-bottom:10px; vertical-align:middle;'>วงเงินเครดิต :&nbsp;".number_format($customer->credit_amount,2)."</td>
 		</tr><tr>
-		<td style='width:50%; padding-left:10px; padding-top:10px; padding-bottom:10px; vertical-align:middle;'>อายุ :&nbsp;"; 
-		if($customer->birthday !="0000-00-00"){ $result .= round(dateDiff($customer->birthday,date('Y-m-d'))/365) ." &nbsp;( ". thaiTextDate($customer->birthday).")" ;}else{$result .= "-";} 
+		<td style='width:50%; padding-left:10px; padding-top:10px; padding-bottom:10px; vertical-align:middle;'>อายุ :&nbsp;";
+		if($customer->birthday !="0000-00-00"){ $result .= round(dateDiff($customer->birthday,date('Y-m-d'))/365) ." &nbsp;( ". thaiTextDate($customer->birthday).")" ;}else{$result .= "-";}
 		$result .="</td>
 		<td style='width:50%; padding-left:10px; padding-top:10px; padding-bottom:10px; vertical-align:middle;'>เครดิตใช้ไป :&nbsp;".number_format($customer->credit_used,2)."</td>
 		</tr><tr>
-		<td style='width:50%; padding-left:10px; padding-top:10px; padding-bottom:10px; vertical-align:middle;'>เพศ : &nbsp;"; 
+		<td style='width:50%; padding-left:10px; padding-top:10px; padding-bottom:10px; vertical-align:middle;'>เพศ : &nbsp;";
 		if($customer->id_gender==1){ $result .="ไม่ระบุ";}else if($customer->id_gender==2){$result .="ชาย";}else{$result .="หญิง";} $result .="</td>
 		<td style='width:50%; padding-left:10px; padding-top:10px; padding-bottom:10px; vertical-align:middle;'>เครดิตคงเหลือ : &nbsp;".number_format($customer->credit_balance,2)."</td>
 		</tr><tr>
@@ -135,7 +170,7 @@ $header = "
 				<th style='width:5%; text-align:center;'>สถานะ</th><th style='width:8%; text-align:center;'>วงเงินเครดิต</th>
 				<th style='width:7%; text-align:center;'>เครดิตเทอม</th><th style='width:10%; text-align:center;'>วันที่สมัคร</th><th colspan='2' style='text-align:center;'>การกระทำ</th>
 			</thead>";
-//******************************************  ค้นหาลูกค้า ***********************************************//		
+//******************************************  ค้นหาลูกค้า ***********************************************//
 if(isset($_GET['text'])){
 	$id_tab = 21;
 	$id_profile = $_GET['id_profile'];
@@ -153,7 +188,7 @@ if(isset($_GET['text'])){
 	$query = "WHERE company LIKE '%$text%' OR first_name LIKE '%$text%' OR last_name LIKE'%$text%' OR customer_code LIKE'%$text%'";
 	$paginator->Per_Page("tbl_customer",$query,$get_rows);
 	$Page_Start = $paginator->Page_Start;
-	$Per_Page = $paginator->Per_Page; 
+	$Per_Page = $paginator->Per_Page;
 	$sql = dbQuery("SELECT id_customer FROM tbl_customer WHERE company LIKE '%$text%' OR first_name LIKE '%$text%' OR last_name LIKE'%$text%' OR customer_code LIKE '%$text%' LIMIT $Page_Start , $Per_Page");
 	//////////////////////////////////////
 	$html = $paginator->display($get_rows,"index.php?content=customer&searchtext=$query&text=$text");
@@ -174,7 +209,7 @@ if(isset($_GET['text'])){
 					<td align='center' style='cursor:pointer;' onclick=\"document.location='index.php?content=customer&view_detail=y&id_customer=$id_customer'\">".$customer->credit_term."</td>
 					<td align='center'>".thaiDate($customer->date_add)."</td>
 					<td align='center' >".can_do($edit, "<a href='index.php?content=customer&edit=y&id_customer=$id_customer' ><button class='btn btn-warning btn-sx'><i class='fa fa-pencil'></i></button></a>")."</td>
-					<td align='center' >".can_do($delete, "<button class='btn btn-danger btn-sx' 
+					<td align='center' >".can_do($delete, "<button class='btn btn-danger btn-sx'
 										onclick=\"confirm_delete('คุณแน่ใจว่าต้องการลบ ".$customer->full_name."', 'โปรดจำไว้ว่าการกระทำนี้ไม่สามารถกู้คืนได้', 'controller/customerController.php?delete=y&id_customer=$id_customer') \">
 										<i class='fa fa-trash'></i></button></a>")."</td>
 				</tr>";
@@ -184,12 +219,12 @@ if(isset($_GET['text'])){
 				$html .="</table>";
 		echo $html;
 	}
-	
-	
+
+
 ////// โอนย้ายลูกค้า +++++++ แสดงรายชื่อลูกค้า  +++++++
 if( isset( $_GET['get_customer_list'] ) && isset( $_GET['id_sale'] ) )
 {
-	$qs = dbQuery("SELECT id_customer, customer_code, first_name, last_name FROM tbl_customer WHERE id_sale = ".$_GET['id_sale']);	
+	$qs = dbQuery("SELECT id_customer, customer_code, first_name, last_name FROM tbl_customer WHERE id_sale = ".$_GET['id_sale']);
 	if( dbNumRows($qs) > 0 )
 	{
 		$res = "<table class='table table-striped'><tr><td align='right' colspan='3'><label ><input type='checkbox' id='check_box' style='margin-right:10px;' onChange='check_all()'>เลือกทั้งหมด</label></td></tr>";
@@ -199,14 +234,14 @@ if( isset( $_GET['get_customer_list'] ) && isset( $_GET['id_sale'] ) )
 		{
 			if( $i == 0 ){ $res .= "<tr style='font-size:12px;'>"; }
 			$res .= "<td><input type='checkbox' class='ck' name='customer[".$rs['id_customer']."]' id='customer_".$rs['id_customer']."' value='".$rs['id_customer']."' /><label for='customer_".$rs['id_customer']."' style='padding-left:15px;'>".$rs['first_name']." ".$rs['last_name']."</label></td>";
-			$i++; 
+			$i++;
 			if($i == 3){ $res .= "</tr>"; $i = 0; }
 		}
-		$res .= "</table>";	
+		$res .= "</table>";
 	}
 	else
 	{
-		$res = "<center><h4>----- ไม่พบลูกค้าในความรับผิดชอบของพนักงานขายที่กำหนด  -----</h4></center>";	
+		$res = "<center><h4>----- ไม่พบลูกค้าในความรับผิดชอบของพนักงานขายที่กำหนด  -----</h4></center>";
 	}
 	echo $res;
 }
@@ -234,7 +269,7 @@ if( isset( $_GET['transfer_customer'] ) && isset( $_GET['from_id'] ) && isset( $
 				$in .= $id;
 				$i++;
 				if( $i<$c){ $in .= ","; }
-			}	
+			}
 			$qs = dbQuery("UPDATE tbl_customer SET id_sale = ".$to_id." WHERE id_customer IN(".$in.") AND id_sale = ".$from_id);
 		}
 		else
@@ -251,13 +286,13 @@ if( isset( $_GET['transfer_customer'] ) && isset( $_GET['from_id'] ) && isset( $
 	{
 		dbRollback();
 		echo "fail";
-	}	
+	}
 }
 
 
 if( isset($_GET['clear_filter']) )
 {
 	setcookie("customer_search_text","", time() -3600, "/");
-	header("location: ../index.php?content=customer");	
+	header("location: ../index.php?content=customer");
 }
 ?>

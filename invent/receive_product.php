@@ -42,6 +42,3 @@
 ?>
 
 <script src="script/receive_product/receive_product.js?token=<?php echo date('YmdH'); ?>"></script>
-<?php if(!isset($_GET['id_receive_product'])) : ?>
-<script src="script/receive_product/receive_list.js?token=<?php echo date('YmdH'); ?>"></script>
-<?php endif; ?>

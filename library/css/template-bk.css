@@ -157,7 +157,13 @@ hr{
 	display:block;
 }
 
+.input-nano {
+  width: 25px; !important;
+}
 
+.input-micro {
+  width: 50px !important;
+}
 
 .input-mini {
 	width:100px !important;
@@ -721,6 +727,12 @@ hr{
 
 
 
+.margin-right-20 {
+	margin-right: 20px !important;
+}
+
+
+
 .margin-top-5{
 	margin-top:5px !important;
 }
@@ -737,6 +749,10 @@ hr{
 	margin-top:15px !important;
 }
 
+
+.margin-top-20{
+	margin-top: 20px !important;
+}
 
 
 .margin-left-5 {
@@ -756,6 +772,10 @@ hr{
 }
 
 
+.margin-left-20 {
+	margin-left: 20px !important;
+}
+
 
 .margin-bottom-5 {
 	margin-bottom:5px;
@@ -773,6 +793,10 @@ hr{
 	margin-bottom:15px !important;
 }
 
+
+.margin-bottom-20 {
+	margin-bottom:20px !important;
+}
 
 
 .middle {
@@ -810,7 +834,6 @@ hr{
 }
 
 
-@media (min-width: 768px){
 
 .col-1-harf {
 	width: 12.5%;
@@ -882,7 +905,7 @@ hr{
 	width: 95.833333333%;
 }
 
-}
+
 
 .pointer{
 	cursor:pointer;
@@ -1090,30 +1113,15 @@ td.one-attribute{
 .hide-text{
   overflow: hidden;
   text-overflow: ellipsis;
-  white-space:normal;
 }
 
-@media (max-width: 767px){
-  .first{
-    padding-left : 5px !important;
-  }
-
-  .last{
-    padding-right : 5px !important;
-  }
-
-  .first-xs{
-    padding-left : 15px !important;
-  }
-
-  .last-xs{
-    padding-right : 15px !important;
-  }
-
-
+.no-radius {
+  border-radius: 0px; !important;
 }
 
-
+.btn-lg {
+  height:46px;
+}
 
 
 input[type=number]::-webkit-inner-spin-button,
@@ -1122,14 +1130,4 @@ input[type=number]::-webkit-outer-spin-button {
     -moz-appearance: none;
     appearance: none;
     margin: 0;
-}
-
-.no-radius {
-  border-radius: 0px !important;
-}
-
-.print-row {
-  width:100%;
-  padding:0px;
-  border:0px;
 }

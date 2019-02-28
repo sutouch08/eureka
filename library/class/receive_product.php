@@ -1,6 +1,18 @@
 <?php
 class receive_product
 {
+	public $id;
+	public $id_receive_product;
+	public $reference;
+	public $invoice;
+	public $po_reference;
+	public $id_po;
+	public $id_employee;
+	public $date_add;
+	public $date_upd;
+	public $remark;
+	public $status;
+	public $error;
 
 public function __construct($id = "")
 {
@@ -16,6 +28,7 @@ public function get_data($id)
 	if( dbNumRows($qs) == 1 )
 	{
 		$rs = dbFetchArray($qs);
+		$this->id = $rs['id_receive_product'];
 		$this->id_receive_product	= $rs['id_receive_product'];
 		$this->reference				= $rs['reference'];
 		$this->invoice					= $rs['invoice'];
@@ -209,16 +222,8 @@ public function add_item(array $data)
 
 
 
-public function delete_doc($id)
+public function delete($id)
 {
-	$qs = $this->get_items($id);
-	if(dbNumRows($qs) > 0 )
-	{
-		while($rs = dbFetchArray($qs) )
-		{
-			$this->delete_item($rs['id_receive_product_detail']);
-		}
-	}
 	return dbQuery("DELETE FROM tbl_receive_product WHERE id_receive_product = ".$id);
 }
 
@@ -229,78 +234,46 @@ public function delete_doc($id)
 
 public function delete_item($id)
 {
-	$rs = $this->isSaved($id);
-	if($rs)
-	{
-		$rd = $this->roll_back_action($id);
-		if($rd)
-		{
-			return dbQuery("DELETE FROM tbl_receive_product_detail WHERE id_receive_product_detail = ".$id);
-		}else{
-			return false;
-		}
-	}else{
-		return dbQuery("DELETE FROM tbl_receive_product_detail WHERE id_receive_product_detail = ".$id);
-	}
+	return dbQuery("DELETE FROM tbl_receive_product_detail WHERE id_receive_product_detail = ".$id);
 }
 
 
 
 
-
-///// Check if item is saved return id_product_attribute, id_zone and qty in array  else return false ///
 public function isSaved($id)
 {
-	$qs = dbQuery("SELECT id_product_attribute FROM tbl_receive_product_detail WHERE id_receive_product_detail = ".$id." AND status = 1");
-	return dbNumRows($qs);
-}
+	$qr  = "SELECT id_product_attribute ";
+	$qr .= "FROM tbl_receive_product_detail ";
+	$qr .= "WHERE id_receive_product_detail = ".$id." ";
+	$qr .= "AND status = 1";
 
+	$qs = dbQuery($qr);
 
-
-
-
-public function roll_back_action($id)
-{
-	$rs = $this->get_item($id);
-
-	if($rs)
+	if(dbNumRows($qs) == 1)
 	{
-		if(!isset($this->reference) )
-		{
-			$this->get_data($rs['id_receive_product']);
-		}
-
-		$rd = $this->delete_movement($this->reference, $rs['id_product_attribute'], $rs['qty'], $rs['id_zone']);
-
-		if($rd)
-		{
-			$rx = update_stock_zone($rs['qty']*-1, $rs['id_zone'], $rs['id_product_attribute']);
-			if($rx)
-			{
-				return $this->receive_item($this->id_po, $rs['id_product_attribute'], $rs['qty']*-1);
-			}
-
-		}else{
-			return false;
-		}
+		return TRUE;
 	}
-}
 
+	return FALSE;
+}
 
 
 
 
 public function get_items($id)
 {
-	$qs 	= "SELECT rd.id_receive_product_detail, rd.id_receive_product, rd.id_product, rd.id_product_attribute, rd.qty, rd.id_warehouse, rd.id_zone, rd.id_employee, rd.date_add, ";
-	$qs	.= "rd.date_upd, rd.status ";
-	$qs	.= "FROM tbl_receive_product_detail AS rd ";
-	$qs 	.= "LEFT JOIN tbl_product_attribute AS p ON rd.id_product_attribute = p.id_product_attribute ";
-	$qs 	.= "LEFT JOIN tbl_size AS s ON p.id_size = s.id_size ";
-	$qs	.= "LEFT JOIN tbl_attribute AS a ON p.id_attribute = a.id_attribute ";
-	$qs 	.= "WHERE rd.id_receive_product = ".$id." ORDER BY rd.id_product ASC, p.id_color ASC, s.position ASC, a.position ASC";
-	$qs 	= dbQuery($qs);
-	return $qs;
+	$qr  = "SELECT rd.id_receive_product_detail, rd.id_receive_product, ";
+	$qr .= "rd.id_product, rd.id_product_attribute, rd.qty, rd.id_warehouse, ";
+	$qr .= "rd.id_zone, rd.id_employee, rd.date_add, ";
+	$qr	.= "rd.date_upd, rd.status ";
+	$qr	.= "FROM tbl_receive_product_detail AS rd ";
+	$qr	.= "LEFT JOIN tbl_product_attribute AS p ON rd.id_product_attribute = p.id_product_attribute ";
+	$qr	.= "LEFT JOIN tbl_size AS s ON p.id_size = s.id_size ";
+	$qr	.= "LEFT JOIN tbl_attribute AS a ON p.id_attribute = a.id_attribute ";
+	$qr	.= "WHERE rd.id_receive_product = ".$id." ";
+	$qr .= "ORDER BY rd.id_product ASC, p.id_color ASC, s.position ASC, a.position ASC";
+
+	return dbQuery($qr);
 }
 
 
@@ -347,9 +320,25 @@ public function add(array $data)
 
 
 
-public function update($id, array $data)
+public function update($id, array $data = array())
 {
-	return dbQuery("UPDATE tbl_receive_product SET invoice = '".$data['invoice']."', po_reference = '".$data['po_reference']."', id_po = ".$data['id_po'].", id_employee = ".$data['id_employee'].", date_add = '".$data['date_add']."', remark = '".$data['remark']."' WHERE id_receive_product = ".$id);
+	if(!empty($data))
+	{
+		$set = "";
+		$i = 1;
+		foreach($data as $field => $value)
+		{
+			$set .= $i == 1 ? $field." = '".$value."'" : ", ".$field." = '".$value."'";
+			$i++;
+		}
+
+		$qr = "UPDATE tbl_receive_product SET ".$set." WHERE id_receive_product = ".$id;
+
+		return dbQuery($qr);
+	}
+
+	return FALSE;
+	//return dbQuery("UPDATE tbl_receive_product SET invoice = '".$data['invoice']."', po_reference = '".$data['po_reference']."', id_po = ".$data['id_po'].", id_employee = ".$data['id_employee'].", date_add = '".$data['date_add']."', remark = '".$data['remark']."' WHERE id_receive_product = ".$id);
 }
 
 
