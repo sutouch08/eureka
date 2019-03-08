@@ -151,33 +151,47 @@ if( isset( $_GET['close_po'] ) && isset( $_GET['id_po'] ) )
 	}
 }
 
+
 //*************************  รับรายการสินค้ามาเพื่อหาข้อมูลแล้วส่งกลับไปแสดงผลใน form ยังไม่มีการบันทึกลงฐานข้อมูล  ******************/
 if( isset( $_GET['insert_item'] ) )
 {
 	$id_product	= $_POST['id_product'];
+	$product = new product();
+	$pdName = get_product_name($id_product);
 	$p_data		= $_POST['qty'];
 	$no			= $_GET['no'];
-	$price		= $_POST['cost'];
 	$discount	= $_POST['discount'];
 	$unit			= $_POST['unit'];
-	if($unit == "percent"){ $d_price = $price - ($price * ($discount*0.01)); }else{ $d_price = $price - $discount; }
+
 	$result		= array();
 	$po			= new po();
+
 	foreach($p_data as $id => $qty)
 	{
 		if($qty != "" )
 		{
+			$pd = $product->getDetail($id);
+
+			if($unit == "percent")
+			{
+				$d_price = $pd->cost - ($pd->cost * ($discount*0.01));
+			}
+			else
+			{
+				$d_price = $pd->cost - $discount;
+			}
+
 			$no++;
 			$arr = array(
-						"no"						=> $no,
-						"id"							=> $id,
-						"code"					=> get_product_reference($id),
-						"product_name"			=> get_product_name($id_product),
-						"price"					=> $price,
-						"qty"						=> $qty,
-						"discount"				=> $discount,
-						"unit"						=> unit_selected($unit),
-						"total_amount"			=> number_format($d_price * $qty,2)
+						"no"	=> $no,
+						"id"		=> $id,
+						"code"	=> $pd->reference,
+						"product_name"	=> $pdName,
+						"price"	=> $pd->cost,
+						"qty"	=> $qty,
+						"discount" => $discount,
+						"unit"	=> unit_selected($unit),
+						"total_amount"	=> number_format($d_price * $qty,2)
 						);
 			array_push($result, $arr);
 		}
@@ -530,7 +544,7 @@ if( isset( $_GET['print_barcode']) && isset( $_GET['id_po'] ) )
 	//***************************** กำหนด css ของ td *****************************//
 	$pattern = array(
 							"text-align: center; border-top:0px;",
-							"border-left: solid 1px #ccc; border-top:0px; text-align:center;",
+							"border-left: solid 1px #ccc; border-top:0px; text-align:center; padding-top:0;; padding-bottom:0px;",
 							"border-left: solid 1px #ccc; border-top:0px;",
 							"text-align:center; border-left: solid 1px #ccc; border-top:0px;",
 							"text-align:center; border-left: solid 1px #ccc; border-top:0px;",
@@ -563,7 +577,7 @@ if( isset( $_GET['print_barcode']) && isset( $_GET['id_po'] ) )
 						$id_product 		= $product->id_product; //$product->getProductId($rs['id_product_attribute']);
 						$product_code 	= $product->product_reference($rs['id_product_attribute']);
 						$product_name 	= "<input type='text' style='border:0px; width:100%;' value='".$product->product_name($id_product)."' />";
-						$barcode			= $print->print_barcode($product->barcode, "width:100%; max-height:5mm;");
+						$barcode			= $print->print_barcode($product->barcode, "width:100%; max-height:8mm;");
 						$dis					= $po->getDiscount($rs['discount_percent'], $rs['discount_amount']); // หาส่วนลด
 						$discount			= number_format($dis['value'],2)." ".$dis['unit'];
 						$data 				= array($n, $barcode, $product_code, number_format($rs['qty']), number_format($rs['price'], 2), $discount, number_format($rs['total_amount'], 2) );
@@ -593,16 +607,16 @@ if( isset( $_GET['print_barcode']) && isset( $_GET['id_po'] ) )
 					$remark = "";
 				}
 				$sub_total = array(
-						array("<td style='height:".$print->sub_total_row_height."mm; border: solid 1px #ccc; border-bottom:0px; border-left:0px; width:60%; text-align:center;'>**** ส่วนลดท้ายบิล : ".number_format($bill_discount,2)." ****</td>
-								<td style='width:20%; height:".$print->sub_total_row_height."mm; border: solid 1px #ccc;'><strong>จำนวนรวม</strong></td>
-								<td style='width:20%; height:".$print->sub_total_row_height."mm; border: solid 1px #ccc; border-right:0px; text-align:right;'>".$qty."</td>"),
-						array("<td rowspan='3' style='height:".$print->sub_total_row_height."mm; border-top: solid 1px #ccc; border-bottom-left-radius:10px; width:55%; font-size:10px;'><strong>หมายเหตุ : </strong>".$remark."</td>
-								<td style='width:20%; height:".$print->sub_total_row_height."mm; border: solid 1px #ccc;'><strong>ราคารวม</strong></td>
-								<td style='width:20%; height:".$print->sub_total_row_height."mm; border: solid 1px #ccc; border-right:0px; text-align:right;'>".$amount."</td>"),
-						array("<td style='height:".$print->sub_total_row_height."mm; border: solid 1px #ccc; border-bottom:0px;'><strong>ส่วนลดรวม</strong></td>
-						<td style='height:".$print->sub_total_row_height."mm; border: solid 1px #ccc; border-right:0px; border-bottom:0px; border-bottom-right-radius:10px; text-align:right;'>".$total_discount_amount."</td>"),
-						array("<td style='height:".$print->sub_total_row_height."mm; border: solid 1px #ccc; border-bottom:0px;'><strong>ยอดเงินสุทธิ</strong></td>
-						<td style='height:".$print->sub_total_row_height."mm; border: solid 1px #ccc; border-right:0px; border-bottom:0px; border-bottom-right-radius:10px; text-align:right;'>".$net_amount."</td>")
+						array("<td style='height:".$print->row_height."mm; border: solid 1px #ccc; border-bottom:0px; border-left:0px; width:60%; text-align:center;'>**** ส่วนลดท้ายบิล : ".number_format($bill_discount,2)." ****</td>
+								<td style='width:20%; height:".$print->row_height."mm; border: solid 1px #ccc;'><strong>จำนวนรวม</strong></td>
+								<td style='width:20%; height:".$print->row_height."mm; border: solid 1px #ccc; border-right:0px; text-align:right;'>".$qty."</td>"),
+						array("<td rowspan='3' style='height:".$print->row_height."mm; border-top: solid 1px #ccc; border-bottom-left-radius:10px; width:55%; font-size:10px;'><strong>หมายเหตุ : </strong>".$remark."</td>
+								<td style='width:20%; height:".$print->row_height."mm; border: solid 1px #ccc;'><strong>ราคารวม</strong></td>
+								<td style='width:20%; height:".$print->row_height."mm; border: solid 1px #ccc; border-right:0px; text-align:right;'>".$amount."</td>"),
+						array("<td style='height:".$print->row_height."mm; border: solid 1px #ccc; border-bottom:0px;'><strong>ส่วนลดรวม</strong></td>
+						<td style='height:".$print->row_height."mm; border: solid 1px #ccc; border-right:0px; border-bottom:0px; border-bottom-right-radius:10px; text-align:right;'>".$total_discount_amount."</td>"),
+						array("<td style='height:".$print->row_height."mm; border: solid 1px #ccc; border-bottom:0px;'><strong>ยอดเงินสุทธิ</strong></td>
+						<td style='height:".$print->row_height."mm; border: solid 1px #ccc; border-right:0px; border-bottom:0px; border-bottom-right-radius:10px; text-align:right;'>".$net_amount."</td>")
 						);
 			echo $print->print_sub_total($sub_total);
 			echo $print->content_end();

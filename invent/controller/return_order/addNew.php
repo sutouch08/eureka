@@ -1,29 +1,26 @@
 <?php
+
 $billCode = $_POST['billCode'];
 $date_add = dbDate($_POST['date_add']);
 $id_customer = $_POST['id_customer'];
 $id_employee = getCookie('user_id');
 $remark = $_POST['remark'];
+$id_zone = $_POST['id_zone'];
 $qtys = $_POST['qty'];
+$prices = $_POST['price'];
 $sc = TRUE;
 
-$order = new order_pos();
+$order = new order();
+$customer = new customer($id_customer);
+$sale = new sale($customer->id_sale);
 $cs = new return_order();
 $stock = new stock();
 $mv = new movement();
-$zone = new zone();
-$pd = new product();
+$zone = new zone($id_zone);
+$product = new product();
 
 $id_order = $order->getId($billCode);
-$order->getData($id_order);
 
-if($id_order == FALSE)
-{
-  $sc = FALSE;
-  $message = 'เลขที่บิลไม่ถูกต้อง';
-}
-else
-{
   if(empty($qtys))
   {
     $sc = FALSE;
@@ -39,7 +36,9 @@ else
       'id_customer' => $id_customer,
       'id_employee' => getCookie('user_id'),
       'date_add' => $date_add,
-      'remark' => $remark
+      'remark' => $remark,
+      'id_zone' => $id_zone,
+      'isSave' => 1
     );
 
     //--- เพิ่มเอกสารรับคืน
@@ -52,40 +51,27 @@ else
     }
     else
     {
-      foreach($qtys as $id_od => $qty)
+      foreach($qtys as $id_pa => $qty)
       {
         if($sc == FALSE)
         {
           break;
         }
 
-        $rs = $order->getDetail($id_od); //--- ได้ object หรือ false;
-        if($rs == FALSE)
+        if($qty > 0)
         {
-          $sc = FALSE;
-          $message = 'ไม่พบรายการซื้อ';
-        }
-        else if($rs->is_cancle == 1)
-        {
-          $sc = FALSE;
-          $message = 'ไม่สามารถรับคืนรายการที่มีการยกเลิกแล้วได้ : '.$rs->product_reference;
-        }
-        else if($qty > ($rs->qty - $rs->cn_qty))
-        {
-          $sc = FALSE;
-          $message = 'จำนวนที่คืนมากกว่าจำนวนที่ซื้อ : '.$rs->product_reference;
-        }
-        else
-        {
+          $pd = $product->getDetail($id_pa);
+          $price = $prices[$id_pa];
 
+          //--- เตรียมข้อมูล
           $arr = array(
             'id_return_order' => $id,
-            'id_product_attribute' => $rs->id_product_attribute,
-            'product_code' => $rs->product_reference,
+            'id_product_attribute' => $pd->id_product_attribute,
+            'product_code' => $pd->reference,
             'qty' => $qty,
-            'price' => $rs->final_price,
-            'amount' => $rs->final_price * $qty,
-            'id_zone' => $rs->id_zone
+            'price' => $price,
+            'amount' => $price * $qty,
+            'valid' => 1
           );
 
           //--- เพิ่มรายการรับคืนในเอกสาร
@@ -96,64 +82,57 @@ else
           }
 
           //--- เพิ่มสต็อก
-          if($stock->updateStockZone($rs->id_zone, $rs->id_product_attribute, $qty) !== TRUE)
+          if($pd->is_visual == 0)
           {
-            $sc = FALSE;
-            $message = 'ปรับปรุงสต็อกไม่สำเร็จ';
+            if($stock->updateStockZone($id_zone, $pd->id_product_attribute, $qty) !== TRUE)
+            {
+              $sc = FALSE;
+              $message = 'ปรับปรุงสต็อกไม่สำเร็จ';
+            }
           }
+
 
           //--- บันทึก movement
-          $movement = $mv->move_in($reference, $zone->getWarehouseId($rs->id_zone), $rs->id_zone, $rs->id_product_attribute, $qty, $date_add);
-          if($movement !== TRUE)
+          if($pd->is_visual == 0)
           {
-            $sc = FALSE;
-            $message = 'บันทึก movement ไม่สำเร็จ';
+            if($mv->move_in($reference, $zone->id_warehouse, $id_zone, $pd->id_product_attribute, $qty, $date_add) !== TRUE)
+            {
+              $sc = FALSE;
+              $message = 'บันทึก movement ไม่สำเร็จ';
+            }
           }
 
-          //----- บันทึกขาย
-          $cost = $pd->getCost($rs->id_product_attribute);
+
           $arr = array(
             'id_order' => 0,
             'reference' => $reference,
-            'id_role' => 12,
+            'id_role' => 8,
             'id_customer' => $id_customer,
             'id_employee' => $id_employee,
-            'id_sale' => 0,
-            'id_product' => $rs->id_product,
-            'id_product_attribute' => $rs->id_product_attribute,
-            'product_name' => $rs->product_name,
-            'product_reference' => $rs->product_reference,
-            'barcode' => $rs->barcode,
-            'product_price' => $rs->final_price,
+            'id_sale' => $customer->id_sale,
+            'id_product' => $pd->id_product,
+            'id_product_attribute' => $pd->id_product_attribute,
+            'product_name' => $pd->product_name,
+            'product_reference' => $pd->reference,
+            'barcode' => $pd->barcode,
+            'product_price' => $price,
             'order_qty' => (-1 * $qty),
             'sold_qty' => (-1 * $qty),
             'reduction_percent' => 0.00,
             'reduction_amount' => 0.00,
             'discount_amount' => 0.00,
-            'final_price' => $rs->final_price,
-            'total_amount' => ($rs->final_price * $qty) * (-1),
-            'cost' => (-1 * $cost),
-            'total_cost' => (-1) * ($qty * $cost),
-            'id_payment' => $order->id_payment
+            'final_price' => $price,
+            'total_amount' => ($price * $qty) * (-1),
+            'cost' => (-1 * $pd->cost),
+            'total_cost' => (-1) * ($qty * $pd->cost),
+            'id_payment' => 0
           );
 
-          if($order->sold($arr) !== TRUE)
+          if($order->sold_product($arr) !== TRUE)
           {
             $sc = FALSE;
             $message = 'บันทึกขายไม่สำเร็จ';
           }
-
-          //--- ปรับปรุงยอดคืนสินค้าใน tbl_order_pos_detail
-          $arr = array(
-            'cn_qty' => ($qty + $rs->cn_qty)
-          );
-
-          if($order->updateDetail($rs->id_order_pos_detail, $arr) !== TRUE)
-          {
-            $sc = FALSE;
-            $message = 'ปรับปรุงยอดคืนในรายการขายไม่สำเร็จ';
-          }
-
         } //--- end if
       } //--- end foreach
     } //--- end if id === FALSE;
@@ -170,7 +149,7 @@ else
     endTransection();
 
   } //--- end if empty qty;
-} //--- end if id_order
+
 
 echo $sc === TRUE ? $id : $message;
 

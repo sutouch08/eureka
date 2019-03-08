@@ -61,7 +61,7 @@ $print->add_subheader($thead);
 //***************************** กำหนด css ของ td *****************************//
 $pattern = array(
             "text-align: center; border-top:0px;",
-            "border-left:solid 1px #ccc; border-top:0px;",
+            "border-left:solid 1px #ccc; border-top:0px; padding-top:0px; padding-bottom:0px;",
             "text-align:right; border-left: solid 1px #ccc; border-top:0px;",
             "text-align:right; border-left:solid 1px #ccc; border-top:0px;",
             "text-align:right; border-left:solid 1px #ccc; border-top:0px;",
@@ -146,7 +146,7 @@ while($total_page > 0 )
   $sub_qty .=    number($qty);
   $sub_qty .= '</td>';
   $sub_qty .= '<td class="width-10 subtotal text-center">';
-  $sub_qty .=    number($amount);
+  $sub_qty .=    $amount;
   $sub_qty .= '</td>';
 
 

@@ -1,56 +1,46 @@
 <div class="container">
 <div class="row" style="height:35px;">
-    <div class="col-lg-8" style="margin-top:10px;">
-    	<h4 class="title">รายงานการรับสินค้าแยกตามเลขที่เอกสาร</h4>
+    <div class="col-sm-8" style="margin-top:10px;">
+    	<h4 class="title"><i class="fa fa-bar-chart"></i> รายงานการรับสินค้าแยกตามเลขที่เอกสาร</h4>
     </div>
-    <div class="col-lg-4">
+    <div class="col-sm-4">
     	<p class="pull-right" style="margin-bottom:0px;">
         	<button type="button" class="btn btn-primary btn-sm" id="report"><i class="fa fa-list"></i>&nbsp; รายงาน</button>
             <button type="button" class="btn btn-success btn-sm" id="gogo"><i class="fa fa-file-excel-o"></i>&nbsp; ส่งออก</button>
         </p>
     </div>
 </div>
-<hr style='border-color:#CCC; margin-top: 5px; margin-bottom:10px;' />
+<hr style="border-color:#CCC; margin-top: 5px; margin-bottom:10px;" />
 <div class="row">
-	<div class="col-lg-2">
-    	<label style="display:block;">เลขที่เอกสาร</label>
-        <div class="btn-group" style="width:100%;">
-        	<button type="button" class="btn btn-primary btn-sm" style="width:50%;" id="btn_all" onClick="select_all()">เลือกทั้งหมด</button>
-            <button type="button" class="btn btn-sm" style="width:50%;" id="btn_range" onClick="select_range()">เลือกเป็นช่วง</button>
+	<div class="col-sm-2 padding-5">
+    	<label class="display-block">เอกสาร</label>
+        <div class="btn-group width-100">
+        	<button type="button" class="btn btn-primary btn-sm width-50" id="btn_all" onClick="select_all()">ทั้งหมด</button>
+            <button type="button" class="btn btn-sm width-50" id="btn_range" onClick="select_range()">เป็นช่วง</button>
 		</div>
 	</div>
-    <div class="col-lg-2">
-    	<label>เริ่มต้น</label>
+    <div class="col-sm-2 padding-5">
+    	<label class="not-show">เริ่มต้น</label>
         <input type="text" class="form-control input-sm" id="from_doc" name="from_doc" placeholder="ระบุเลขที่เอกสารเริ่มต้น" disabled />
     </div>
-     <div class="col-lg-2">
+     <div class="col-sm-2 padding-5">
     	<label>สิ้นสุด</label>
         <input type="text" class="form-control input-sm" id="to_doc" name="to_doc" placeholder="ระบุเลขที่เอกสารสุดท้าย" disabled />
     </div>
-	<div class="col-lg-2">
-    	<label>จากวันที่</label>
-        <input type="text" name="from_date" id="from_date" class="form-control input-sm" style="text-align:center" placeholder="ระบุวันที่เริ่มต้น" autocomplete="off" />
+	<div class="col-sm-3 padding-5">
+    	<label class="display-block">วันที่</label>
+        <input type="text" id="from_date" class="form-control input-sm input-discount text-center" style="text-align:center" placeholder="ระบุวันที่เริ่มต้น" autocomplete="off" />
+        <input type="text" id="to_date" class="form-control input-sm input-unit text-center" style="text-align:center" placeholder="ระบุวันที่สิ้นสุด" autocomplete="off" />
     </div>
-    <div class="col-lg-2">
-    	<label>ถึงวันที่</label>
-        <input type="text" name="to_date" id="to_date" class="form-control input-sm" style="text-align:center" placeholder="ระบุวันที่สิ้นสุด" autocomplete="off" />
-    </div>
+
 </div>
 <input type="hidden" name="range" id="range" value="0" />
 
-<hr style='border-color:#CCC; margin-top: 10px; margin-bottom:10px;' />
+<hr style="border-color:#CCC; margin-top: 10px; margin-bottom:10px;" />
 <div class="row">
-	<div class="col-lg-12" id="result"><!---  แสดงผลลัพธ์ตามเงื่อนไขที่กำหนด  ---></div>
+	<div class="col-sm-12" id="result"><!---  แสดงผลลัพธ์ตามเงื่อนไขที่กำหนด  ---></div>
 </div>
 </div><!--- Container --->
-<?php 
-		$data = "";
-		$qs = dbQuery("SELECT reference FROM tbl_receive_product ORDER BY reference");
-		while($rs = dbFetchArray($qs) )
-		{
-			$data .= "'".$rs['reference']."', ";
-		}
-?>		
 <script id="template" type="text/x-handlebars-template">
 <table class="table table-striped">
 	<thead>
@@ -82,37 +72,37 @@
 </table>
 </script>
 
-<div class='modal fade' id='po_modal' tabindex='-1' role='dialog' aria-labelledby='myModalLabel' aria-hidden='true'>
-    <div class='modal-dialog' id='modal_po' style="width:900px;;">
-        <div class='modal-content'>
-        	<div class='modal-header'>
-				<button type='button' class='close' data-dismiss='modal' aria-hidden='true'>&times;</button>										
+<div class="modal fade" id="po_modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog" id="modal_po" style="width:900px;;">
+        <div class="modal-content">
+        	<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
 			</div>
-            <div class='modal-body' id='po_detail' style="padding-top: 20px;">
+            <div class="modal-body" id="po_detail" style="padding-top: 20px;">
             	<center>----- No content -----</center>
             </div>
-            <div class='modal-footer'>
+            <div class="modal-footer">
             <input type="hidden" id="id_po" value="" />
             <button type="button" class="btn btn-info" onclick="print_po()"><i class="fa fa-print"></i> พิมพ์</button>
-            <button type='button' class='btn btn-default' data-dismiss='modal'>ปิด</button>
+            <button type="button" class="btn btn-default" data-dismiss="modal">ปิด</button>
             </div>
         </div>
     </div>
 </div>
 
-<div class='modal fade' id='receive_modal' tabindex='-1' role='dialog' aria-labelledby='myModalLabel' aria-hidden='true'>
-    <div class='modal-dialog' id='modal' style="width:900px;">
-        <div class='modal-content'>
-        	<div class='modal-header'>
-				<button type='button' class='close' data-dismiss='modal' aria-hidden='true'>&times;</button>										
+<div class="modal fade" id="receive_modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog" id="modal" style="width:900px;">
+        <div class="modal-content">
+        	<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
 			</div>
-            <div class='modal-body' id='receive_detail'>
+            <div class="modal-body" id="receive_detail">
             	<center>----- No content -----</center>
             </div>
-            <div class='modal-footer'>
+            <div class="modal-footer">
             <input type="hidden" id="id_received" value="" />
             <button type="button" class="btn btn-info" onclick="print_received()"><i class="fa fa-print"></i> พิมพ์</button>
-            <button type='button' class='btn btn-default' data-dismiss='modal'>ปิด</button>
+            <button type="button" class="btn btn-default" data-dismiss="modal">ปิด</button>
             </div>
         </div>
     </div>
@@ -123,45 +113,45 @@
 {{#each this}}
 {{#if @first}}
 <div class="row">
-	<div class="col-lg-2">
+	<div class="col-sm-2">
     	<label>เลขที่เอกสาร</label>
     	<span class="form-control input-sm" style="border:0px; padding-left:0px;">{{ reference }}</span>
     </div>
-    <div class="col-lg-2">
+    <div class="col-sm-2">
     	<label >วันที่</label>
     	<span class="form-control input-sm" style="border:0px; padding-left:0px;">{{ date_add }}</span>
     </div>
-    <div class="col-lg-3">
+    <div class="col-sm-3">
     	<label >ใบส่งสินค้า</label>
     	<span class="form-control input-sm" style="border:0px; padding-left:0px;">{{ invoice }}</span>
     </div>
-    <div class="col-lg-2">
+    <div class="col-sm-2">
     	<label>ใบสั่งซื้อ</label>
     	<span class="form-control input-sm" style="border:0px; padding-left:0px;">{{ po_reference }}</span>
     </div>
-    <div class="col-lg-3">
+    <div class="col-sm-3">
     	<label>ผู้ทำรายการ</label>
     	<span class="form-control input-sm" style="border:0px; padding-left:0px;">{{ employee }}</span>
     </div>
-    <div class="col-lg-12">
+    <div class="col-sm-12">
     	<label>หมายเหตุ</label>
     	<span class="form-control input-sm" style="border:0px; padding-left:0px;">{{ remark }}</span>
     </div>
 </div>
-<hr style='border-color:#CCC; margin-top: 10px; margin-bottom:10px;' />
+<hr style="border-color:#CCC; margin-top: 10px; margin-bottom:10px;" />
 <div class="row">
-	<div class="col-lg-4"><i class="fa fa-check" style="color:green;"></i>&nbsp; = &nbsp; บันทึกแล้ว &nbsp;&nbsp; <i class="fa fa-remove" style="color:red;"></i>&nbsp; = &nbsp; ยังไม่บันทึก </div>
+	<div class="col-sm-4"><i class="fa fa-check" style="color:green;"></i>&nbsp; = &nbsp; บันทึกแล้ว &nbsp;&nbsp; <i class="fa fa-remove" style="color:red;"></i>&nbsp; = &nbsp; ยังไม่บันทึก </div>
 </div>
-<hr style='border-color:#CCC; margin-top: 10px; margin-bottom:10px;' />
+<hr style="border-color:#CCC; margin-top: 10px; margin-bottom:10px;" />
 <div class="row">
-	<div class="col-lg-12">
-    	<table class='table table-striped'>
+	<div class="col-sm-12">
+    	<table class="table table-striped">
             <thead>
-                <th style='width:5%; text-align:center;'>ลำดับ</th>
-                <th style='width:15%;'>รหัส</th>
+                <th style="width:5%; text-align:center;">ลำดับ</th>
+                <th style="width:15%;">รหัส</th>
                 <th>สินค้า</th>
                 <th style="text-align:center; width: 10%;">โซน</th>
-                <th style='width:10%; text-align:center;'>จำนวน</th>
+                <th style="width:10%; text-align:center;">จำนวน</th>
                 <th style="width:5%; text-align:center;">สถานะ</th>
             </thead>
 {{else}}
@@ -185,38 +175,38 @@
         </tr>
     {{/if}}
 {{/if}}
-{{/each}}             
+{{/each}}
  </script>
- 
-<!------------------  PO detail ------------------->     
+
+<!------------------  PO detail ------------------->
 <script id="po" type="text/x-handlebars-template">
 {{#each this}}
-	{{#if @first}}                           
+	{{#if @first}}
 <div class="row">
-	<div class="col-lg-2">
+	<div class="col-sm-2">
     	<label>เลขที่เอกสาร</label>
         <span class="form-control input-sm" style="border:0px; padding-left:0px;" >{{ reference }}</span>
     </div>
-    <div class="col-lg-2">
+    <div class="col-sm-2">
     	<label>วันที่เอกสาร</label>
         <span class="form-control input-sm" style="border:0px; padding-left:0px;">{{ date_add }}</span>
     </div>
-    <div class="col-lg-2">
+    <div class="col-sm-2">
     	<label>รหัสผู้ขาย</label>
         <span class="form-control input-sm" style="border:0px; padding-left:0px;">{{ sup_code }}</span>
     </div>
-    <div class="col-lg-4">
+    <div class="col-sm-4">
     	<label>ชื่อผู้ขาย</label>
         <span class="form-control input-sm" style="border:0px; padding-left:0px;">{{ supplier }}</span>
     </div>
-    <div class="col-lg-2">
+    <div class="col-sm-2">
     	<label>กำหนดรับสินค้า</label>
         <span class="form-control input-sm" style="border:0px; padding-left:0px;">{{ due_date }}</span>
-    </div>    
-</div>    
-<hr style='border-color:#CCC; margin-top: 10px; margin-bottom:10px;' />
+    </div>
+</div>
+<hr style="border-color:#CCC; margin-top: 10px; margin-bottom:10px;" />
 <div class="row">
-	<div class="col-lg-12">
+	<div class="col-sm-12">
     	<table class="table table-bordered" style="margin-bottom:0px;">
         	<thead style="font-size:10px;">
             	<th style="width:5%; text-align:center">ลำดับ</th>
@@ -229,8 +219,8 @@
                 <th style="width:10%; text-align:right;">จำนวนเงิน</th>
                 <th style="width:10%; text-align:right;">รับแล้ว</th>
             </thead>
-           
-	{{else}} 
+
+	{{else}}
 		 {{#if @last}}
 					</table>
 					 <table class="table table-bordered" style="margin-bottom:50px;">
@@ -259,7 +249,7 @@
 					</table>
 				</div>
 			</div>
-		{{else}}           		
+		{{else}}
 			<tr style="font-size:10px;">
 				<td align="center" style="border-left:solid 1px #DDD;">{{ no }}</td>
 				<td style="border-left:solid 1px #DDD;">{{ product_reference }}</td>
@@ -271,10 +261,10 @@
 				<td align="right" style="border-left:solid 1px #DDD;">{{ total_amount }}</td>
 				<td align="right" style="border-left:solid 1px #DDD;">{{ received }}</td>
 			</tr>
-		{{/if}}       
+		{{/if}}
 	{{/if}}
 {{/each}}
-</script>    
+</script>
 <script>
 function received_detail(id)
 {
@@ -297,8 +287,11 @@ function received_detail(id)
 function print_received()
 {
 	var id = $("#id_received").val();
-	window.open("controller/receiveProductController.php?print&id_receive_product="+id, "_blank");
+  var center = ($(document).width() - 800)/2;
+	window.open("controller/receiveProductController.php?print&id_receive_product="+id, "_blank", "width=800, height=900. left="+center+", scrollbars=yes");
 }
+
+
 function po_detail(id_po)
 {
 	$.ajax({
@@ -317,13 +310,15 @@ function po_detail(id_po)
 	});
 }
 
+
 function print_po()
 {
 	var id_po = $("#id_po").val();
-	window.open("controller/poController.php?print_barcode&id_po="+id_po, "_blank");
+  var center = ($(document).width() - 800)/2;
+	window.open("controller/poController.php?print_barcode&id_po="+id_po, "_blank", "width=800, height=900. left="+center+", scrollbars=yes");
 }
 
-var docList = [<?php echo $data; ?>];
+
 
 function select_all()
 {
@@ -345,49 +340,48 @@ function select_range()
 }
 
 $("#from_doc").autocomplete({
-	source : docList,
+	source : 'controller/autoComplete.php?getReceiveReference',
 	autoFocus : true,
 	close : function()
 	{
 		var from = $(this).val();
 		var to 	= $("#to_doc").val();
-		if(to != "")
+
+		if(to.length > 0 && from > to)
 		{
-			if(to < from)
-			{
-				$("#to_doc").val(from);
-				$(this).val(to);
-			}
+      $('#from_doc').val(to);
+      $('#to_doc').val(from);
 		}
+
 		$("#to_doc").focus();
 	}
 });
 
+
+
 $("#to_doc").autocomplete({
-	source : docList,
+	source : 'controller/autoComplete.php?getReceiveReference',
 	autoFocus : true,
 	close : function()
 	{
 		var to 	= $(this).val();
-		var from	= $("#from_doc").val();	
-		if( from != "")
-		{
-			if( to < from)
-			{
-				$("#from_doc").val(to);
-				$(this).val(from);
-			}
-		}
+		var from	= $("#from_doc").val();
+		if(from.length > 0 && from > to)
+    {
+      $('#from_doc').val(to);
+      $('#to_doc').val(from);
+    }
 	}
 });
 
+
 $("#from_date").datepicker({
-	dateFormat: 'dd-mm-yy', onClose: function(selectedDate){ $("#to_date").datepicker("option", "minDate", selectedDate); }
+	dateFormat: "dd-mm-yy", onClose: function(selectedDate){ $("#to_date").datepicker("option", "minDate", selectedDate); }
 });
 $("#to_date").datepicker({
-	dateFormat: 'dd-mm-yy', onClose: function(selectedDate){ $("#from_date").datepicker("option", "maxDate", selectedDate); }
+	dateFormat: "dd-mm-yy", onClose: function(selectedDate){ $("#from_date").datepicker("option", "maxDate", selectedDate); }
 });
-	
+
 $("#report").click(function(e) {
 	var from 			= $("#from_date").val();
 	var to				= $("#to_date").val();
@@ -395,18 +389,18 @@ $("#report").click(function(e) {
 	var from_doc 	= $("#from_doc").val();
 	var to_doc 		= $("#to_doc").val();
 	if( range == 1 && (from_doc == "" || to_doc == "") )
-	{ 
+	{
 		swal("กรุณาระบุเลขที่เอกสารทั้ง 2 ช่อง");
 		return false;
 	}
 	if(!isDate(from) || !isDate(to))
 	{
 		swal("วันที่ไม่ถูกต้อง");
-		return false;	
+		return false;
 	}
-	get_report(range, from_doc, to_doc, from, to);	
+	get_report(range, from_doc, to_doc, from, to);
 });
-	
+
 $("#gogo").click(function(e) {
     var from 			= $("#from_date").val();
 	var to				= $("#to_date").val();
@@ -414,18 +408,18 @@ $("#gogo").click(function(e) {
 	var from_doc 	= $("#from_doc").val();
 	var to_doc 		= $("#to_doc").val();
 	if( range == 1 && (from_doc == "" || to_doc == "") )
-	{ 
+	{
 		swal("กรุณาระบุเลขที่เอกสารทั้ง 2 ช่อง");
 		return false;
 	}
 	if(!isDate(from) || !isDate(to))
 	{
 		swal("วันที่ไม่ถูกต้อง");
-		return false;	
+		return false;
 	}
 	go_export(range, from_doc, to_doc, from, to)
 });
-	
+
 function get_report(range, from_doc, to_doc, from, to)
 {
 	load_in();
@@ -439,7 +433,7 @@ function get_report(range, from_doc, to_doc, from, to)
 			var data = $.parseJSON(data);
 			var output = $("#result");
 			render(source, data, output);
-			load_out();	
+			load_out();
 		}
 	});
 }

@@ -5,6 +5,7 @@ $product = new product();
 $zone = new zone();
 $qs = $rd->getDetails($rd->id_receive_product);
 $po = new po();
+$accept = getConfig('RECEIVE_OVER_PO') * 0.01;
 ?>
 <div class="container">
   <div class="row top-row">
@@ -83,8 +84,8 @@ $po = new po();
               <?php $pd = $product->getDetail($rs->id_product_attribute); ?>
               <?php $poItem = $po->getDetailByItem($rd->id_po, $rs->id_product_attribute); ?>
               <?php $sumReceive = $poItem->received + $rs->qty; ?>
-              <?php $over = ($poItem->qty - $sumReceive) < 0 ? 0 : $poItem->qty - $sumReceive; ?>
-              <?php $backlog = ($poItem->qty - $sumReceive) > 0 ? 0 : ($poItem->qty - $sumReceive)*-1; ?>
+              <?php $backlog = ($poItem->qty - $sumReceive) < 0 ? 0 : $poItem->qty - $sumReceive; ?>
+              <?php $over = ($poItem->qty - $sumReceive) > 0 ? 0 : ($poItem->qty - $sumReceive)*-1; ?>
             <tr class="font-size-12">
               <td class="text-center middle"><?php echo $no; ?></td>
               <td class="middle"><?php echo $pd->reference; ?></td>
@@ -93,8 +94,8 @@ $po = new po();
               <td class="middle text-center"><?php echo number($poItem->received);  ?></td>
               <td class="middle text-center"><?php echo number($rs->qty); ?></td>
               <td class="middle text-center"><?php echo number($sumReceive);  ?></td>
-              <td class="middle text-center"><?php echo number($over); ?></td>
               <td class="middle text-center"><?php echo number($backlog); ?></td>
+              <td class="middle text-center"><?php echo number($over); ?></td>
             </tr>
             <?php
                 $no++;
@@ -112,15 +113,20 @@ $po = new po();
               <td class="middle text-center"><strong><?php echo number($totalReceived); ?></strong></td>
               <td class="middle text-center"><strong><?php echo number($totalQty); ?></strong></td>
               <td class="middle text-center"><strong><?php echo number($totalSumReceived); ?></strong></td>
-              <td class="middle text-center"><strong><?php echo number($totalOver); ?></strong></td>
               <td class="middle text-center"><strong><?php echo number($totalBacklog); ?></strong></td>
+              <td class="middle text-center"><strong><?php echo number($totalOver); ?></strong></td>
             </tr>
           <?php else : ?>
             <tr id="pre_label"><td align='center' colspan='9'><h4>----------  ยังไม่มีสินค้า ----------</h4></td></tr>
           <?php endif; ?>
         </tbody>
       </table>
+      <?php if($totalOver > 0 && (($totalOver * $totalPO) / 100) > $accept) : ?>
+        <input type="hidden" id="overAccept" value="1" />
+      <?php endif; ?>
     </div>
   </div>
 </div><!--/ container -->
+<?php include 'include/receive_product/confirmReceiveModal.php'; ?>
+
 <script src="script/receive_product/receive_review.js?token=<?php echo date('YmdH'); ?>"></script>

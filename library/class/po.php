@@ -82,6 +82,8 @@ public function unClosePO($id_po)
 }
 
 
+
+
 public function unCloseDetail($id_po)
 {
 	return dbQuery("UPDATE tbl_po_detail SET valid = 0 WHERE id_po = ".$id_po);
@@ -111,6 +113,18 @@ public function close_po($id_po)
 
 
 
+//---- check if po all detail is valided then close po
+public function validPo($id_po)
+{
+	$qr = "SELECT id_po_detail FROM tbl_po_detail WHERE id_po = ".$id_po." AND valid = 0";
+	$qs = dbQuery($qr);
+	if(dbNumRows($qs) == 0)
+	{
+		return dbQuery("UPDATE tbl_po SET valid = 1 WHERE id_po = ".$id_po);
+	}
+
+	return FALSE;
+}
 
 
 public function delete_po($id_po)
@@ -199,7 +213,7 @@ public function getPoBacklog($id_po)
 	$qr .= "LEFT JOIN tbl_product_attribute AS pd ON po.id_product_attribute = pd.id_product_attribute ";
 	$qr .= "LEFT JOIN tbl_product AS pr ON pd.id_product = pr.id_product ";
 	$qr .= "WHERE po.id_po = ".$id_po." ";
-	$qr .= "AND po.valid = 0";
+	//$qr .= "AND po.valid = 0";
 	//echo $qr;
 
 	return dbQuery($qr);
@@ -353,6 +367,16 @@ public function receive_item($id_po, $id_product_attribute, $qty)
 	return dbQuery("UPDATE tbl_po_detail SET received = received + ".$qty." WHERE id_po = ".$id_po." AND id_product_attribute = ".$id_product_attribute);
 }
 
+
+public function validReceivedItem($id_po, $id_pa)
+{
+	$qr  = "UPDATE tbl_po_detail SET valid = 1 ";
+	$qr .= "WHERE id_po = ".$id_po." ";
+	$qr .= "AND id_product_attribute = ".$id_pa." ";
+	$qr .= "AND received >= qty ";
+
+	return dbQuery($qr);
+}
 
 
 

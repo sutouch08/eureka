@@ -82,6 +82,21 @@ class order{
 
 
 
+	public function getId($reference)
+	{
+		$qs = dbQuery("SELECT id_order FROM tbl_order WHERE reference = '".$reference."'");
+		if(dbNumRows($qs) == 1)
+		{
+			$rs = dbFetchObject($qs);
+			return $rs->id_order;
+		}
+
+		return FALSE;
+	}
+
+
+
+
 	public function sold_product(array $ds = array())
 	{
 		if(!empty($ds))
@@ -118,9 +133,20 @@ class order{
 
 	public function unSoldProduct($id_order, $id_product_attribute)
 	{
-		return dbQuery("DELETE FROM tbl_order_detail_sold WHERE id_order = ".$id_order." AND id_product_attribute = ".$id_product_attribute);
+		$qr  = "DELETE FROM tbl_order_detail_sold ";
+		$qr .= "WHERE id_order = ".$id_order." ";
+		$qr .= "AND id_product_attribute = ".$id_product_attribute;
+		return dbQuery($qr);
 	}
 
+
+	public function unSoldProductByReference($reference, $id_pa)
+	{
+		$qr  = "DELETE FROM tbl_order_detail_sold ";
+		$qr .= "WHERE reference = '".$reference."' ";
+		$qr .= "AND id_product_attribute = ".$id_pa;
+		return dbQuery($qr);
+	}
 
 
 

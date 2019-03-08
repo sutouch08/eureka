@@ -12,12 +12,16 @@ if(isset($_GET['getSaleIdByCustomer']))
 	echo json_encode(array('name' => $sale->full_name));
 }
 
+
+
+
 if(isset($_GET['getCustomer']))
 {
 	$txt = $_REQUEST['term'];
 	$qr  = "SELECT id_customer, first_name, last_name, company ";
 	$qr .= "FROM tbl_customer ";
-	$qr .= "WHERE first_name LIKE '%".$txt."%' ";
+	$qr .= "WHERE customer_code LIKE '%".$txt."%' ";
+	$qr .= "OR first_name LIKE '%".$txt."%' ";
 	$qr .= "OR last_name LIKE '%".$txt."%' ";
 	$qr .= "OR company LIKE '%".$txt."%' ";
 

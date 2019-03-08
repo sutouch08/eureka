@@ -1,24 +1,24 @@
 <?php
 	$p_rank 	= $_GET['po'];
 	$s_rank 	= $_GET['sup'];
-	$t_rank	= $_GET['rank'];
-	
+	$t_rank		= $_GET['rank'];
+
 	//---  PO Query
 	$pQuery	= $p_rank == 2 ? "AND po_reference = '" . trim($_GET['reference']) . "' " : "";
-	
+
 	//---- Supplier Query
 	$sQuery	= $s_rank == 2 ? "AND id_supplier = " . $_GET['id_sup'] . " " : "";
-	
+
 	//---- Time Query
-	$from		= $t_rank == 2 ? fromDate($_GET['from_date']) : date('Y-01-01 00:00:00');
-	$to		= $t_rank == 2 ? toDate($_GET['to_date']) : date('Y-12-31 23:59:59');
-	
+	$from		= fromDate($_GET['from_date']);
+	$to		= toDate($_GET['to_date']);
+
 	//---- Title
 	$topTitle	= 'รายงานการรับสินค้าจากการขายแสดงรายการสินค้า ใบสั่งซื้อ และ ผู้ขาย';
 	$poTitle	= $p_rank == 2 ? trim($_GET['reference']) : 'ทั้งหมด';
 	$supTitle	= $s_rank == 2 ? supplier_name($_GET['id_sup']) : 'ทั้งหมด';
 	$preTitle	= thaiDate($from,'/') .' - ' . thaiDate($to, '/'); 
-	
+
 	//$pGroup	= getConfig('ITEMS_GROUP');
 	$excel	= new PHPExcel();
 
@@ -29,10 +29,10 @@
 	$excel->getProperties()->setDescription("This file was generate by Smart invent web application via PHPExcel v.1.8");
 	$excel->getProperties()->setKeywords("Samart Invent");
 	$excel->getProperties()->setCategory("Stock Report");
-	
+
 	$excel->setActiveSheetIndex(0);
 	$excel->getActiveSheet()->setTitle('รายงานการรับสินค้าเข้า');
-	
+
 	$excel->getActiveSheet()->setCellValue('A1', $topTitle);
 	$excel->getActiveSheet()->mergeCells('A1:J1');
 	$excel->getActiveSheet()->setCellValue('A2', 'ใบสั่งซื้อ');
@@ -53,7 +53,7 @@
 	$excel->getActiveSheet()->setCellValue('H6', 'ราคา');
 	$excel->getActiveSheet()->setCellValue('I6', 'จำนวน');
 	$excel->getActiveSheet()->setCellValue('J6', 'มูลค่า');
-	
+
 
 	$qr = "SELECT tbl_receive_product.date_add AS date_add, tbl_receive_product_detail.id_product_attribute AS id_pa, tbl_product_attribute.reference AS item, ";
 	$qr .= "tbl_receive_product.reference AS reference, tbl_receive_product.invoice, tbl_po.id_po, po_reference AS po, tbl_po.id_supplier, SUM( tbl_receive_product_detail.qty ) AS qty ";
@@ -65,13 +65,13 @@
 	$qr .= $pQuery . $sQuery;
 	$qr .= "GROUP BY tbl_receive_product_detail.id_product_attribute, tbl_receive_product.reference";
 	$qs = dbQuery($qr);
-	
+
 	if( dbNumRows($qs) > 0 )
 	{
 		$row	= 7;  //------ เริ่มต้นแถวที่ 7
 		$no	= 1;
 		while( $rs = dbFetchObject($qs) )
-		{			
+		{
 			$y		= date('Y', strtotime($rs->date_add) );
 			$m		= date('m', strtotime($rs->date_add) );
 			$d		= date('d', strtotime($rs->date_add) );
@@ -86,12 +86,12 @@
 			$excel->getActiveSheet()->setCellValue('H'.$row, getPoPriceItem($rs->id_po, $rs->id_pa) ); //----- ราคาตามใบสั่งซื้อ
 			$excel->getActiveSheet()->setCellValue('I'.$row, $rs->qty); //----- จำนวนที่รับ
 			$excel->getActiveSheet()->setCellValue('J'.$row, '=H'.$row.'*I'.$row );  //----- มูลค่า
-			
+
 			$no++;
 			$row++;
 
 		}//----- end while
-		
+
 		$excel->getActiveSheet()->setCellValue('A'.$row, 'รวม');
 		$excel->getActiveSheet()->mergeCells('A'.$row.':H'.$row);
 		$excel->getActiveSheet()->getStyle('A'.$row)->getAlignment()->setHorizontal('right');
@@ -103,15 +103,15 @@
 		$excel->getActiveSheet()->getStyle('J7:J'.$row)->getNumberFormat()->setFormatCode('#,##0.00');
 
 	}
-	
+
 	//echo '<pre>'; print_r($excel); echo '</pre>';
 	setToken($_GET['token']);
-	
+
 	$file_name = "รายงานการรับสินค้าเข้า .xlsx";
 	header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'); /// form excel 2007 XLSX
 	header('Content-Disposition: attachment;filename="'.$file_name.'"');
 	$writer = PHPExcel_IOFactory::createWriter($excel, 'Excel2007');
-	$writer->save('php://output'); 
-	
+	$writer->save('php://output');
+
 
 ?>

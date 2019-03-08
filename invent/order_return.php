@@ -15,10 +15,19 @@
 	{
 		include 'include/return_order/return_order_add.php';
 	}
+
+	else if(isset($_GET['edit']))
+	{
+		include 'include/return_order/return_order_edit.php';
+	}
+
+
 	else if(isset($_GET['viewDetail']))
 	{
 		include 'include/return_order/return_order_detail.php';
 	}
+
+
 	else
 	{
 		include 'include/return_order/return_order_list.php';

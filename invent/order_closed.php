@@ -119,10 +119,12 @@
 
         <?php if($order->current_state == 9) : ?>
         	<p class="pull-right top-p">
-            	<button type="button" class="btn btn-primary btn-sm" onClick="printBill(<?php echo $id_order; ?>)"><i class="fa fa-print"></i> พิมพ์</button>
-                <button type="button" class="btn btn-success btn-sm" onClick="printBarcode(<?php echo $id_order; ?>)"><i class="fa fa-print"></i> พิมพ์บาร์โค้ด</button>
-                <button type="button" class="btn btn-default btn-sm" onClick="printPackingList(<?php echo $id_order; ?>)"><i class="fa fa-file-text-o"></i> Picking List</button>
-                <button type="button" class="btn btn-info btn-sm" onClick="printAddress(<?php echo $id_order; ?>, <?php echo $order->id_customer; ?>)"><i class="fa fa-file-text-o"></i> พิมพ์ใบปะหน้า</button>
+            <button type="button" class="btn btn-primary btn-sm" onClick="printBill(<?php echo $id_order; ?>)"><i class="fa fa-print"></i> พิมพ์</button>
+            <button type="button" class="btn btn-success btn-sm" onClick="printBarcode(<?php echo $id_order; ?>)"><i class="fa fa-print"></i> พิมพ์บาร์โค้ด</button>
+						<!--
+						<button type="button" class="btn btn-default btn-sm" onClick="printPackingList(<?php echo $id_order; ?>)"><i class="fa fa-file-text-o"></i> Picking List</button>
+						-->
+            <button type="button" class="btn btn-info btn-sm" onClick="printAddress(<?php echo $id_order; ?>, <?php echo $order->id_customer; ?>)"><i class="fa fa-file-text-o"></i> พิมพ์ใบปะหน้า</button>
             </p>
             <?php if( $order->payment == 'ออนไลน์' ) : ?>
             	<input type="hidden" name="online" id="online" value="1" />

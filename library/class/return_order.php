@@ -7,6 +7,8 @@ class return_order
   public $id_customer;
   public $id_employee;
   public $isCancle = 0;
+  public $isSave;
+  public $id_zone;
   public $date_add;
   public $date_upd;
   public $remark;
@@ -82,6 +84,38 @@ class return_order
 
 
 
+
+  public function update($id, array $ds = array())
+  {
+    if(!empty($ds))
+    {
+      $set = "";
+      $i = 1;
+      foreach($ds as $field => $value)
+      {
+        $set .= $i == 1 ? $field ." = '".$value."'" : ", ".$field." = '".$value."'";
+        $i++;
+      }
+
+      $qr  = "UPDATE tbl_return_order SET ".$set." ";
+      $qr .= "WHERE id = ".$id;
+
+      if(dbQuery($qr) !== TRUE)
+      {
+        $this->error = dbError();
+        return FALSE;
+      }
+
+      return TRUE;
+    }
+
+    return FALSE;
+  }
+
+
+
+
+
   public function addDetail(array $ds = array())
   {
     $sc = FALSE;
@@ -112,6 +146,25 @@ class return_order
   }
 
 
+
+
+  public function delete_item($id)
+  {
+    return dbQuery("DELETE FROM tbl_return_order_detail WHERE id = ".$id);
+  }
+
+
+
+
+  public function delete($id)
+  {
+    return dbQuery("DELETE FROM tbl_return_order WHERE id = ".$id);
+  }
+
+
+
+  
+
   public function getSumQty($id)
   {
     $qs = dbQuery("SELECT SUM(qty) FROM tbl_return_order_detail WHERE id_return_order = '".$id."'");
@@ -119,6 +172,9 @@ class return_order
 
     return is_null($qty) ? 0 : $qty;
   }
+
+
+
 
 
   public function getSumAmount($id)
@@ -129,12 +185,83 @@ class return_order
     return is_null($rs->amount) ? 0 : $rs->amount;
   }
 
-  
+
+
+
 
   public function cancelDetail($id)
   {
     return dbQuery("UPDATE tbl_return_order_detail SET isCancle = 1 WHERE id = ".$id);
   }
+
+
+
+  public function dropAllDetails($id)
+  {
+    return dbQuery("DELETE FROM tbl_return_order_detail WHERE id_return_order = ".$id);
+  }
+
+
+  public function isSaved($id)
+  {
+    $qr = "SELECT isSave FROM tbl_return_order WHERE id = ".$id;
+    $qs = dbQuery($qr);
+    if(dbNumRows($qs) == 1)
+    {
+      $rs = dbFetchObject($qs);
+      return $rs->isSave == 1 ? TRUE : FALSE;
+    }
+
+    return FALSE;
+  }
+
+
+
+  public function saveReturn($id)
+  {
+    return dbQuery("UPDATE tbl_return_order SET isSave = 1 WHERE id = ".$id);
+  }
+
+
+
+
+  public function unSaveReturn($id)
+  {
+    return dbQuery("UPDATE tbl_return_order SET isSave = 0 WHERE id = ".$id);
+  }
+
+
+
+
+  public function isValidDetail($id)
+  {
+    $qr = "SELECT valid FROM tbl_return_order_detail WHERE id = ".$id;
+    $qs = dbQuery($qr);
+    if(dbNumRows($qs) == 1)
+    {
+      $rs = dbFetchObject($qs);
+      return $rs->valid == 1 ? TRUE : FALSE;
+    }
+
+    return FALSE;
+  }
+
+
+
+  public function validDetail($id)
+  {
+    return dbQuery("UPDATE tbl_return_order_detail SET valid = 1 WHERE id = ".$id);
+  }
+
+
+
+
+  public function unValidDetail($id)
+  {
+    return dbQuery("UPDATE tbl_return_order_detail SET valid = 0 WHERE id = ".$id);
+  }
+
+
 
 
   //-----------------  New Reference --------------//

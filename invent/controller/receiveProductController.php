@@ -134,6 +134,10 @@ if(isset($_GET['updateReceiveProduct']))
 
 }
 
+
+
+
+
 if(isset($_GET['getPoDetail']))
 {
 	$id_po = $_GET['id_po'];
@@ -168,6 +172,7 @@ if(isset($_GET['getPoDetail']))
 		echo 'No data found !';
 	}
 }
+
 
 
 
@@ -307,12 +312,17 @@ if( isset( $_GET['cancleReceiveItem']) && isset($_POST['id_receive_product']))
 
 
 
+
+
 if( isset($_GET['unSaveRecieved']) && isset($_POST['id_receive_product']))
 {
 	$sc = TRUE;
 	$message = '';
 	$id = $_POST['id_receive_product'];
-	$rd = new receive_product();
+	$rd = new receive_product($id);
+	$stock = new stock();
+	$po = new po();
+	$movement = new movement();
 	$qs = $rd->getSavedDetails($id);
 
 	if(dbNumRows($qs) > 0)
@@ -325,11 +335,27 @@ if( isset($_GET['unSaveRecieved']) && isset($_POST['id_receive_product']))
 				break;
 			}
 
-			if($rd->roll_back_action($rs->id_receive_product_detail) === FALSE)
+			//--- delete movement
+			if($movement->dropMoveIn($rd->reference, $rs->id_zone, $rs->id_product_attribute) !== TRUE)
 			{
 				$sc = FALSE;
-				$message = 'ย้อนรายการไม่สำเร็จ';
+				$message = 'ลบ Movement ไม่สำเร็จ';
 			}
+
+			//--- ลดยอดในโซนที่รับเข้า
+			if($stock->updateStockZone($rs->id_zone, $rs->id_product_attribute, $rs->qty * -1) !== TRUE)
+			{
+				$sc = FALSE;
+				$message = 'ตัดยอดจากโซนรับเข้าไม่สำเร็จ';
+			}
+
+			//--- Update PO detail received
+			if($po->receive_item($rd->id_po, $rs->id_product_attribute, $rs->qty * -1) !== TRUE)
+			{
+				$sc = FALSE;
+				$message = 'ปรับปรุงยอดรับในใบสั่งซื้อไม่สำเร็จ';
+			}
+
 
 			if($rd->change_item_status($rs->id_receive_product_detail, 0) === FALSE)
 			{
@@ -364,26 +390,130 @@ if( isset($_GET['unSaveRecieved']) && isset($_POST['id_receive_product']))
 
 
 
-
-
-/****************** End New code  *********************/
-
-
-
-if( isset( $_GET['check_approve'] ) && isset( $_POST['password'] ) )
+if(isset($_GET['getApprover']))
 {
-	$rs = "fail";
-	$pass = md5(trim($_POST['password']));
-	$qs = dbQuery("SELECT id_employee FROM tbl_employee JOIN tbl_access ON tbl_employee.id_profile = tbl_access.id_profile WHERE s_key = '".$pass."' AND id_tab = 49 AND ( tbl_access.add =1 OR tbl_access.edit = 1 OR tbl_access.delete = 1)");
-	if(dbNumRows($qs) == 1 )
+	$pwd = $_GET['s_key'];
+	$s_key = md5(trim($pwd));
+	$qr  = "SELECT em.id_employee FROM tbl_employee AS em ";
+	$qr .= "JOIN tbl_access AS ac ON em.id_profile = ac.id_profile ";
+	$qr .= "WHERE ac.id_tab = 49 ";
+	$qr .= "AND (ac.add = 1 OR ac.edit = 1 OR ac.delete = 1) ";
+	$qr .= "AND em.s_key = '".$s_key."' ";
+
+	$qs = dbQuery($qr);
+	if(dbNumRows($qs) > 0)
 	{
-		$rs = "success";
+		$rs = dbFetchObject($qs);
+		echo $rs->id_employee;
 	}
-	echo $rs;
+	else
+	{
+		echo 'invalid';
+	}
 }
 
 
 
+if(isset($_GET['saveAdd']))
+{
+	$sc = TRUE;
+	$id = $_POST['id_receive_product'];
+	$approver = $_POST['id_approver'];
+
+	$rd = new receive_product($id);
+	$stock = new stock();
+	$po = new po($rd->id_po);
+	$movement = new movement();
+
+	startTransection();
+
+	$qs = $rd->get_items($id);
+
+	if(dbNumRows($qs) > 0)
+	{
+		//--- update status po
+		if($po->valid != 1)
+		{
+			$po->update_status($rd->id_po, 2);
+		}
+
+		while($rs = dbFetchObject($qs))
+		{
+			//--- ถ้าเจอข้อผิดพลาดออกจาก loop ทันที
+			if($sc === FALSE)
+			{
+				break;
+			}
+
+			if($rs->status == 0)
+			{
+				//--- เพิ่มสต็อก
+				if($stock->updateStockZone($rs->id_zone, $rs->id_product_attribute, $rs->qty) !== TRUE)
+				{
+					$sc = FALSE;
+					$message = 'เพิ่มสต็อกเข้าโซนไม่สำเร็จ';
+				}
+
+				//--- insert movement
+				if($movement->move_in($rd->reference, $rs->id_warehouse, $rs->id_zone, $rs->id_product_attribute, $rs->qty, $rd->date_add) !== TRUE)
+				{
+					$sc = FALSE;
+					$message = 'บันทึก movement ไม่สำเร็จ';
+				}
+
+				//--- update po detail
+				if($po->receive_item($rd->id_po, $rs->id_product_attribute, $rs->qty) !== TRUE)
+				{
+					$sc = FALSE;
+					$message = 'ปรับปรุงยอดรับในใบสั่งซื้อไม่สำเร็จ';
+				}
+
+				//--- ถ้ารับครบแล้วปิดรายการไปเลย
+				$po->validReceivedItem($rd->id_po, $rs->id_product_attribute);
+
+				//--- เปลี่นสถานะรายการรับเข้า
+				if($rd->change_item_status($rs->id_receive_product_detail, 1) !== TRUE)
+				{
+					$sc = FALSE;
+					$message = 'เปลี่ยนสถานะรายการรับเข้าไม่สำเร็จ';
+				}
+
+				if($sc === TRUE && $approver != 0)
+				{
+					$rd->updateApprover($id, $approver);
+				}
+
+			} //--- end if
+		} //--- end while
+
+		//--- เช็คถ้ารับครบ po แล้วทุกรายการให้ปิด po
+		if($sc === TRUE)
+		{
+			$po->validPo($rd->id_po);
+			if($rd->change_status($id, 1) !== TRUE)
+			{
+				$sc = FALSE;
+				$message = 'เปลี่ยนสถานะใบรับสินค้าไม่สำเร็จ';
+			}
+		}
+
+		if($sc === TRUE)
+		{
+			commitTransection();
+		}
+		else
+		{
+			dbRollback();
+		}
+	} //-- end if
+
+	endTransection();
+
+	echo $sc === TRUE ? 'success' : $message;
+}
+
+
+/****************** End New code  *********************/
 
 
 
@@ -399,17 +529,6 @@ if( isset( $_GET['save_edit'] ) && isset( $_POST['id_receive_product'] ) )
 	}
 }
 
-if( isset( $_GET['save_add'] ) && isset( $_POST['id_receive_product'] ) )
-{
-	$rd	= new receive_product();
-	$rs	= $rd->save_add($_POST['id_receive_product']);
-	if($rs)
-	{
-		echo "success";
-	}else{
-		echo "fail";
-	}
-}
 
 
 

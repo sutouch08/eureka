@@ -1,5 +1,27 @@
 <?php
-require "../../library/config.php";
+include "../../library/config.php";
+include "../../library/functions.php";
+include "../function/tools.php";
+
+if(isset($_GET['getZone']))
+{
+	$code = trim($_GET['zoneCode']);
+	$qr = "SELECT * FROM tbl_zone WHERE barcode_zone = '".$code."'";
+	$qs = dbQuery($qr);
+	if(dbNumRows($qs) == 1)
+	{
+		$rs = dbFetchArray($qs);
+		echo json_encode($rs);
+	}
+	else
+	{
+		echo "notfound";
+	}
+
+}
+
+
+
 //********************* ตรวจสอบชื่อซ้ำกันหรือไม่ ก่อนเพิ่มหรือแก้ไข ********************************//
 if(isset($_GET['zone_name'])&&isset($_GET['id_warehouse'])&&isset($_GET['id_zone'])){
 	$zone_name = $_GET['zone_name'];
@@ -18,6 +40,9 @@ if(isset($_GET['zone_name'])&&isset($_GET['id_warehouse'])&&isset($_GET['id_zone
 		echo $message;
 	}
 }
+
+
+
 //********************************** ตรวจสอบบาร์โค้ดซ้ำก่อน เพิ่มหรือแก้ไข **********************************//
 if(isset($_GET['barcode_zone'])&&isset($_GET['id_warehouse'])&&isset($_GET['id_zone'])){
 	$barcode_zone = $_GET['barcode_zone'];
@@ -36,6 +61,10 @@ if(isset($_GET['barcode_zone'])&&isset($_GET['id_warehouse'])&&isset($_GET['id_z
 		echo $message;
 	}
 }
+
+
+
+
 //********************************** เพิ่มโซน ***********************************************//
 if(isset($_GET['add'])&&isset($_POST['zone_name'])){
 	$zone_name = $_POST['zone_name'];
@@ -44,6 +73,9 @@ if(isset($_GET['add'])&&isset($_POST['zone_name'])){
 	dbQuery("INSERT INTO tbl_zone (id_warehouse, barcode_zone, zone_name) VALUES ($id_warehouse,'$barcode_zone','$zone_name')");
 	header("location:../index.php?content=zone&add=y&id_warehouse=$id_warehouse");
 }
+
+
+
 //********************************************* แก้ไขโซน *****************************************//
 if(isset($_GET['edit'])&&isset($_POST['id_zone'])){
 	$id_zone = $_POST['id_zone'];
@@ -53,6 +85,10 @@ if(isset($_GET['edit'])&&isset($_POST['id_zone'])){
 	dbQuery("UPDATE tbl_zone SET id_warehouse =$id_warehouse, barcode_zone='$barcode_zone', zone_name = '$zone_name' WHERE id_zone = $id_zone");
 	header("location: ../index.php?content=zone");
 }
+
+
+
+
 //******************************************  ลบโซน *************************************//
 if(isset($_GET['delete'])&&isset($_GET['id_zone'])){
 	$id_zone = $_GET['id_zone'];
@@ -65,6 +101,11 @@ if(isset($_GET['delete'])&&isset($_GET['id_zone'])){
 		header("location: ../index.php?content=zone&error=$error_message");
 	}
 }
+
+
+
+
+
 if(isset($_GET['check'])&&isset($_GET['barcode_zone'])){
 	$barcode_zone = $_GET['barcode_zone'];
 	$sql = dbQuery("SELECT id_zone FROM tbl_zone WHERE barcode_zone = '$barcode_zone'");
@@ -76,6 +117,7 @@ if(isset($_GET['check'])&&isset($_GET['barcode_zone'])){
 		echo "0";
 	}
 }
+
 
 
 if(isset($_REQUEST['term'])){

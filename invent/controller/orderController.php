@@ -1851,7 +1851,7 @@ function doc_type($role)
 	switch($role){
 		case 1 :
 			$content="order";
-			$title = "Packing List";
+			$title = "Sale Order";
 			break;
 		case 2 :
 			$content = "requisition";

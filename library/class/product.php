@@ -45,6 +45,7 @@ public function __construct()
 }
 
 
+
 public function getCost($id_pa)
 {
 	$sc = 0;
@@ -88,7 +89,7 @@ public function addProduct(array $ds)
 
 public function getDetail($id_pa)
 {
-	$qr = "SELECT pa.*, pd.product_name ";
+	$qr = "SELECT pa.*, pd.product_name, pd.is_visual ";
 	$qr .= "FROM tbl_product_attribute AS pa ";
 	$qr .= "JOIN tbl_product AS pd ON pa.id_product = pd.id_product ";
 	$qr .= "WHERE id_product_attribute = ".$id_pa;
@@ -1337,46 +1338,64 @@ public function getCoverImage($id_productx,$use_size='',$class=''){
 }
 
 
-public function get_image_path($id_image,$use_size){
-			$count = strlen($id_image);
-			$path = str_split($id_image);
-			$image_path = WEB_ROOT."img/product";
-			$n=0;
-					while($n<$count){
-						$image_path .= "/".$path[$n];
-						$n++;
-					}
-				$image_path .= "/";
-				$image_path_name ="";
-					switch($use_size){
-						case "1" :
-							$pre_fix = "product_mini_";
-							$no_image = "no_image_mini";
-							break;
-						case "2" :
-							$pre_fix = "product_default_";
-							$no_image = "no_image_default";
-							break;
-						case "3" :
-							$pre_fix = "product_medium_";
-							$no_image = "no_image_medium";
-							break;
-						case "4" :
-							$pre_fix = "product_lage_";
-							$no_image = "no_image_lage";
-							break;
-						default :
-							$pre_fix = "";
-							$no_image = "no_image_mini";
-							break;
-					}
-					if($n == "0"){
-						$image_path_name = $image_path.$no_image.".jpg";
-					}else{
-						$image_path_name = $image_path.$pre_fix.$id_image.".jpg";
-					}
-		return $image_path_name;
+public function get_image_path($id_image,$use_size)
+{
+	$count = strlen($id_image);
+	$path = str_split($id_image);
+	$image_path = WEB_ROOT."img/product/";
+	$noImgPath	= WEB_ROOT."img/product/";
+	$n = 0;
+
+	while($n<$count)
+	{
+		$image_path .= $path[$n].'/';
+		$n++;
+	}
+
+	$image_path_name ="";
+
+	switch($use_size)
+	{
+		case "1" :
+			$pre_fix = "product_mini_";
+			$no_image = "no_image_mini";
+		break;
+		case "2" :
+			$pre_fix = "product_default_";
+			$no_image = "no_image_default";
+		break;
+		case "3" :
+			$pre_fix = "product_medium_";
+			$no_image = "no_image_medium";
+		break;
+		case "4" :
+			$pre_fix = "product_lage_";
+			$no_image = "no_image_lage";
+		break;
+		default :
+			$pre_fix = "";
+			$no_image = "no_image_mini";
+		break;
+	}
+
+
+	$noImgPath = $noImgPath.$no_image.'.jpg';
+
+	$path = $image_path.$pre_fix.$id_image.".jpg";
+
+	$file = $_SERVER['DOCUMENT_ROOT'].$path;
+
+	if( file_exists($file))
+	{
+		return $path;
+	}
+	else
+	{
+		return $noImgPath;
+	}
+
 }
+
 
 
 public function get_product_attribute_image($id_product_attribute,$use_size){

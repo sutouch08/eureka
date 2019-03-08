@@ -12,6 +12,7 @@ class receive_product
 	public $date_upd;
 	public $remark;
 	public $status;
+	public $approver;
 	public $error;
 
 public function __construct($id = "")
@@ -28,17 +29,10 @@ public function get_data($id)
 	if( dbNumRows($qs) == 1 )
 	{
 		$rs = dbFetchArray($qs);
-		$this->id = $rs['id_receive_product'];
-		$this->id_receive_product	= $rs['id_receive_product'];
-		$this->reference				= $rs['reference'];
-		$this->invoice					= $rs['invoice'];
-		$this->po_reference			= $rs['po_reference'];
-		$this->id_po					= $rs['id_po'];
-		$this->id_employee			= $rs['id_employee'];
-		$this->date_add				= $rs['date_add'];
-		$this->date_upd				= $rs['date_upd'];
-		$this->remark					= $rs['remark'];
-		$this->status					= $rs['status'];
+		foreach($rs as $key => $value)
+		{
+			$this->$key = $value;
+		}
 	}
 }
 
@@ -67,47 +61,11 @@ public function getSavedDetails($id)
 
 
 
-public function save_add($id)
+
+public function updateApprover($id, $approver)
 {
-	$i 			= 0;
-	$qs 		= $this->get_items($id);
-	$rows 	= dbNumRows($qs);
-	if($rows > 0 )
-	{
-		if(!isset($this->reference))
-		{
-			$this->get_data($id);
-		}
-		$po = new po($this->id_po);
-		if($po->valid != 1 ){ $po->update_status($this->id_po, 2); }
-		while($rs = dbFetchArray($qs) ) :
-			if($rs['status'] == 0 )
-			{
-				$rd = update_stock_zone($rs['qty'], $rs['id_zone'], $rs['id_product_attribute']);
-				if($rd)
-				{
-					$rm = $this->insert_movement("in", 1, $rs['id_product_attribute'],$rs['id_warehouse'], $rs['qty'], $this->reference, dbDate($this->date_add, true), $rs['id_zone']);
-					$this->receive_item($this->id_po, $rs['id_product_attribute'], $rs['qty']);
-					$rx = $this->valid_qty_with_po($this->id_po,$rs['id_product_attribute']);
-					if($rx){ $this->change_valid_po_detail($rx); }
-					$this->change_item_status($rs['id_receive_product_detail'], 1);
-					$i++;
-				}
-			}
-			else if($rs['status'] == 1)
-			{
-				$rx = $this->valid_qty_with_po($this->id_po,$rs['id_product_attribute']);
-				if($rx){ $this->change_valid_po_detail($rx); }
-				$i++;
-			}
-		endwhile;
-	}
-	$this->valid_po($this->id_po);
-	if($i == $rows){ $this->change_status($id, 1); }
-	return $i;
+	return dbQuery("UPDATE tbl_receive_product SET approve = ".$approver." WHERE id_receive_product = ".$id);
 }
-
-
 
 
 
@@ -515,6 +473,35 @@ public function valid_po($id_po)
 	if(dbNumRows($qs) == 0 )
 	{
 		dbQuery("UPDATE tbl_po SET valid = 1 WHERE id_po = ".$id_po);
+	}
+}
+
+
+
+public function roll_back_action($id)
+{
+	$rs = $this->get_item($id);
+
+	if($rs)
+	{
+		if(!isset($this->reference) )
+		{
+			$this->get_data($rs['id_receive_product']);
+		}
+
+		$rd = $this->delete_movement($this->reference, $rs['id_product_attribute'], $rs['qty'], $rs['id_zone']);
+
+		if($rd)
+		{
+			$rx = update_stock_zone($rs['qty']*-1, $rs['id_zone'], $rs['id_product_attribute']);
+			if($rx)
+			{
+				return $this->receive_item($this->id_po, $rs['id_product_attribute'], $rs['qty']*-1);
+			}
+
+		}else{
+			return false;
+		}
 	}
 }
 

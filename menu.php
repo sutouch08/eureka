@@ -101,10 +101,10 @@
         	<li><a href="index.php?content=current_stock"><i class='fa fa-list'></i>  รายงานสินค้าคงเหลือปัจจุบัน</a></li>
           <li><a href="index.php?content=stock_report"><i class="fa fa-bar-chart"></i>  รายงานสินค้าคงเหลือ</a></li>
           <li><a href="index.php?content=stock_zone_report"><i class="fa fa-bar-chart"></i>  รายงานสินค้าคงเหลือแยกตามโซน</a></li>
-          <li><a href="index.php?content=stock_by_warehouse"><i class="fa fa-bar-chart"></i>  รายงานสินค้าคงเหลือเปรียบเทียบคลัง</a></li>
-          <li><a href="index.php?content=movement_summary">		<i class="fa fa-bar-chart"></i>  รายงานสรุป ยอดความเคลื่อนไหวสินค้า เปรียบเทียบ เข้า - ออก</a></li>
-          <li><a href="index.php?content=fifo"><i class="fa fa-bar-chart"></i>  รายงานความเคลื่อนไหวสินค้าแต่ละตัว</a></li>
-          <li><a href="index.php?content=total_fifo"><i class="fa fa-bar-chart"></i>  รายงานยอดรวมสินค้าเข้า-ออก</a></li>
+<!--          <li><a href="index.php?content=stock_by_warehouse"><i class="fa fa-bar-chart"></i>  รายงานสินค้าคงเหลือเปรียบเทียบคลัง</a></li> -->
+<!--          <li><a href="index.php?content=movement_summary">		<i class="fa fa-bar-chart"></i>  รายงานสรุป ยอดความเคลื่อนไหวสินค้า เปรียบเทียบ เข้า - ออก</a></li> -->
+<!--          <li><a href="index.php?content=fifo"><i class="fa fa-bar-chart"></i>  รายงานความเคลื่อนไหวสินค้าแต่ละตัว</a></li>-->
+<!--          <li><a href="index.php?content=total_fifo"><i class="fa fa-bar-chart"></i>  รายงานยอดรวมสินค้าเข้า-ออก</a></li>-->
           <li><a href="index.php?content=non_move"><i class="fa fa-bar-chart"></i>  รายงานสินค้าไม่เคลื่อนไหว</a></li>
 <!--          <li><a href="index.php?content=request_report"><i class="fa fa-bar-chart"></i>  รายงานการร้องขอสินค้า</a></li>-->
 <!--          <li><a href="index.php?content=request_by_customer"><i class="fa fa-bar-chart"></i>  รายงานการร้องขอสินค้า แยกตามลูกค้า</a></li> -->
@@ -157,9 +157,9 @@
       	<ul class="dropdown-menu">
         	<li><a href="index.php?content=stock_backlogs"><i class="fa fa-bar-chart"></i>  รายงาน สินค้าค้างส่ง</a></li>
           <li><a href="index.php?content=order_backlogs"><i class="fa fa-bar-chart"></i>  รายงาน ออเดอร์ค้างส่ง</a></li>
-          <li class="divider"></li>
+<!--          <li class="divider"></li>
         	<li><a href="index.php?content=sponsor_by_customer">	<i class="fa fa-bar-chart"></i>  รายงาน ยอดสปอนเซอร์ (ให้บุคคลภายนอก)</a></li>
-          <li><a href="index.php?content=sponsor_summary">			<i class="fa fa-bar-chart"></i>  รายงานสรุป ยอดสปอนเซอร์ (ให้บุคคลภายนอก)</a></li>
+          <li><a href="index.php?content=sponsor_summary">			<i class="fa fa-bar-chart"></i>  รายงานสรุป ยอดสปอนเซอร์ (ให้บุคคลภายนอก)</a></li> -->
 <!--          <li><a href="index.php?content=support_by_employee">		<i class="fa fa-bar-chart"></i>  รายงาน ยอดเบิกอภินันทนาการ (สำหรับพนักงาน) </a></li> -->
 <!--          <li><a href="index.php?content=support_summary">			<i class="fa fa-bar-chart"></i>  รายงานสรุป ยอดเบิกอภินันทนาการ (สำหรับพนักงาน) </a></li> -->
         </ul>

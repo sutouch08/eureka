@@ -24,23 +24,31 @@ if($cs != FALSE)
   {
     $no = 1;
     $totalQty = 0;
+    $totalAmount = 0;
     while($rs = dbFetchObject($qs))
     {
       $arr = array(
         'no' => $no,
-        'id' => $rs->id_order_detail_sold,
+        'id' => $rs->id_product_attribute,
         'barcode' => $rs->barcode,
         'product' => $rs->product_reference.' : '.$rs->product_name,
         'price' => $rs->final_price,
-        'qty' => $rs->sold_qty
+        'qty' => $rs->sold_qty,
+        'amount' => $rs->total_amount
       );
 
       array_push($ds, $arr);
       $totalQty += $rs->sold_qty;
+      $totalAmount += $rs->total_amount;
       $no++;
     }
 
-    array_push($ds, array('totalQty' => $totalQty));
+    // $arr = array(
+    //     'totalQty' => $totalQty,
+    //     'totalAmount' => $totalAmount
+    //   );
+    //
+    // array_push($ds, $arr);
   }
   else
   {

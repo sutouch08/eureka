@@ -17,7 +17,16 @@ function show_discount($percent, $amount)
 {
 	 $unit 	= " %";
 	 $dis	= 0.00;
-	if($percent != 0.00){ $dis = $percent; }else{ $dis = number_format($amount, 2); $unit = ""; }
+	if($percent != 0.00)
+	{
+		$dis = $percent;
+	}
+	else
+	{
+		$dis = number_format($amount, 2);
+		$unit = "";
+	}
+
 	return $dis.$unit;
 }
 
@@ -155,8 +164,8 @@ function doc_type($role)
 {
 	switch($role){
 		case 1 :
-			$content="order";
-			$title = "Packing List";
+		$content = "order";
+		$title = "ใบส่งของ / ใบแจ้งหนี้";
 			break;
 		case 2 :
 			$content = "requisition";

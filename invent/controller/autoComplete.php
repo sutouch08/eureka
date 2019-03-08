@@ -73,6 +73,48 @@ if( isset( $_GET['get_tranform_reference'] ) && isset( $_REQUEST['term'] ) )
 	}
 	echo json_encode($data);
 }
+
+
+
+if(isset($_GET['getReceiveReference']) && isset($_REQUEST['term']))
+{
+		$limit = 50;
+		$txt = trim($_REQUEST['term']);
+		$ds = array();
+		if($txt != '')
+		{
+
+			if($txt == '*')
+			{
+				$qr = "SELECT reference FROM tbl_receive_product ORDER BY reference DESC LIMIT ".$limit;
+			}
+			else
+			{
+				$qr = "SELECT reference FROM tbl_receive_product WHERE reference LIKE '%".$txt."%' ORDER BY reference DESC LIMIT ".$limit;
+			}
+
+			$qs = dbQuery($qr);
+
+			if(dbNumRows($qs) > 0)
+			{
+				while($rs = dbFetchObject($qs))
+				{
+					$ds[] = $rs->reference;
+				}
+			}
+		}
+		else
+		{
+			$ds[] = 'no data found';
+		}
+
+
+		echo json_encode($ds);
+}
+
+
+
+
 /****************   PO And Supplier ****************/
 if( isset( $_REQUEST['term'] ) && isset( $_GET['get_po'] ) )
 {

@@ -44,6 +44,8 @@ function updateSaleName(){
   });
 }
 
+
+
 $('#txt-bill').keyup(function(e){
   if(e.keyCode == 13){
     getBillDetail();
@@ -52,12 +54,23 @@ $('#txt-bill').keyup(function(e){
 
 
 
+$('#txt-customer').keyup(function(e){
+  if(e.keyCode == 13){
+    if(id_customer != ''){
+      $('#remark').focus();
+    }
+  }
+});
+
+
+
+
 function getBillDetail(){
   var reference = $('#txt-bill').val();
   if(reference.length == 0){
     return false;
   }
-  
+
   load_in();
   $.ajax({
     url:'controller/returnOrderController.php?getBillDetail',
@@ -78,7 +91,9 @@ function getBillDetail(){
         data = ds.data;
         output = $('#result');
         render(source, data, output);
-        inputInit();
+        //inputInit();
+        reCal();
+        //hideControl();
       }else{
         swal('Error!', rs, 'error');
         $('#txt-customer').val('');
@@ -94,29 +109,30 @@ function getBillDetail(){
 }
 
 
-function inputInit(){
-  $('.qty').keyup(function(e){
-    if(e.keyCode == 13){
-      $('.qty').eq($(this).index() + 1).focus();
-    }else{
-      ids = $(this).attr('id').split('-');
-      id = ids[1];
-      limit = parse_int($('#qty-'+id).text());
-      qty = parse_int($(this).val());
 
-      if(qty > limit || qty < 0){
-        $(this).val('');
-      }
-      reCal();
-    }
 
-  });
-}
+// function inputInit(){
+//   $('.qty').keyup(function(e){
+//     if(e.keyCode == 13){
+//       $('.qty').eq($(this).index() + 1).focus();
+//     }else{
+//       ids = $(this).attr('id').split('-');
+//       id = ids[1];
+//       limit = parse_int($('#qty-'+id).text());
+//       qty = parse_int($(this).val());
+//
+//       // if(qty > limit || qty < 0){
+//       //   $(this).val('');
+//       // }
+//       reCal();
+//     }
+//
+//   });
+// }
 
 
 
 function reCal(){
-  console.log('recal');
   var sumQty = 0;
   var sumAmount = 0;
   $('.qty').each(function(index, el) {
@@ -127,13 +143,14 @@ function reCal(){
     price = parseFloat($('#price-'+id).text());
     price = isNaN(price) ? 0 : price;
 
+    amount = (qty * price);
     sumQty += qty;
-    sumAmount += (qty * price);
-    $('#cnAmount-'+id).text(addCommas(qty * price));
+    sumAmount += amount;
+    $('#cnAmount-'+id).text(addCommas(amount.toFixed(2)));
   });
 
   $('#sumQty').text(addCommas(sumQty));
-  $('#sumAmount').text(addCommas(sumAmount));
+  $('#sumAmount').text(addCommas(sumAmount.toFixed(2)));
 }
 
 
@@ -157,22 +174,38 @@ function saveReturn(){
   var date_add = $('#date_add').val();
   var id_customer = $('#id_customer').val();
   var remark = $('#remark').val();
+  var id_zone = $('#id_zone').val();
   var count = 0;
-  if(billCode == ''){
-    swal('เลขที่บิลไม่ถูกต้อง');
+
+  if(billCode.length == 0){
+    swal('กรุณาระบุเลขที่บิลขาย');
     return false;
   }
+
 
   if(!isDate(date_add)){
     swal('วันที่ไม่ถูกต้อง');
     return false;
   }
 
+  if(id_customer == ''){
+    swal('กรุณาระบุลูกค้า');
+    return false;
+  }
+
+
+  if(id_zone == ''){
+    swal('กรุณาระบุโซนรับสินค้า');
+    return false;
+  }
+
+
   ds = [
     {'name' : 'billCode', 'value' : billCode},
     {'name' : 'date_add', 'value' : date_add},
     {'name' : 'id_customer', 'value' : id_customer},
-    {'name' : 'remark' , 'value' : remark}
+    {'name' : 'remark' , 'value' : remark},
+    {'name' : 'id_zone', 'value' : id_zone}
   ];
 
   $('.qty').each(function(index, el) {
@@ -187,18 +220,29 @@ function saveReturn(){
 
   });
 
+
+  $('.price').each(function(index, el) {
+    ids = $(this).attr('id').split('-');
+    id = ids[1];
+    price = removeCommas($(this).text());
+    price = parse_float(price);
+    name = 'price['+id+']';
+    ds.push({'name' : name, 'value' : price});
+  });
+
   if(count == 0){
     swal('ไม่พบรายการรับคืน');
     return false;
   }
 
+  load_in();
   $.ajax({
     url:'controller/returnOrderController.php?addNew',
     type:'POST',
     cache:'false',
     data: ds,
     success:function(rs){
-      //--- rs = id_return_order
+      load_out();
       var rs = parseInt($.trim(rs));
       if(! isNaN(rs)){
         swal({
@@ -213,6 +257,87 @@ function saveReturn(){
       }else{
         swal('Error!', rs, 'error');
       }
+    }
+  });
+}
+
+
+
+$('#zoneCode').keyup(function(e){
+  if(e.keyCode == 13){
+      setZone();
+  }
+});
+
+
+
+function changeZone(){
+  $('#id_zone').val('');
+  $('#zoneCode').removeAttr('disabled').val('');
+  $('#zoneName').removeAttr('disabled').val('');
+  $('#btn-change-zone').addClass('hide');
+  $('#btn-set-zone').removeClass('hide');
+  $('#zoneCode').focus();
+}
+
+
+function setZone(){
+  var code = $('#zoneCode').val();
+  if(code.length > 0){
+    $.ajax({
+      url:'controller/zoneController.php?getZone',
+      type:'GET',
+      cache:false,
+      data:{
+        'zoneCode' : code
+      },
+      success:function(rs){
+        var rs = $.trim(rs);
+        if(isJson(rs)){
+          var ds = $.parseJSON(rs);
+          $('#id_zone').val(ds.id_zone);
+          $('#zoneName').val(ds.zone_name);
+          $('#zoneCode').val(ds.barcode_zone);
+
+          //-----
+          $('#zoneCode').attr('disabled', 'disabled');
+          $('#zoneName').attr('disabled', 'disabled');
+          $('#btn-set-zone').addClass('hide');
+          $('#btn-change-zone').removeClass('hide');
+          updateZone();
+        }else{
+          swal('รหัสโซนไม่ถูกต้อง');
+        }
+      }
+    });
+  }
+}
+
+
+function updateZone(){
+  var id = $('#id_return_order').val();
+  var id_zone = $('#id_zone').val();
+
+  //--- ถ้ายังไม่เคยบันทึก (กรณี add new )
+  if(id == ''){
+    return false;
+  }
+
+  //--- ถ้ายังไม่มี id_zone
+  if(id_zone == ''){
+    return false;
+  }
+
+  $.ajax({
+    url:'controller/returnOrderController.php?updateZone',
+    type:'POST',
+    cache:false,
+    data:{
+      'id_return_order' : id,
+      'id_zone' : id_zone
+    },
+    success:function(rs){
+      console.log(rs);
     }
   });
 }

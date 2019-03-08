@@ -48,6 +48,10 @@ function getInvoice($id_order)
 	}
 	return $sc;
 }
+
+
+
+
 function getCategoryMaxDepth()
 {
 	$sc = 1;
@@ -60,6 +64,9 @@ function getCategoryMaxDepth()
 
 	return $sc;
 }
+
+
+
 
 //-----------------------  ส่งกลับ id_customer ที่คั่นด้วย , เพื่อนำไปใช้กับ query
 function customer_in($txt)

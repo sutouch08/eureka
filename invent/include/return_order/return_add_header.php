@@ -3,7 +3,7 @@
     <label>เลขที่เอกสาร</label>
     <input type="text" class="form-control input-sm text-center" value="<?php echo $cs->getNewReference(); ?>" disabled />
   </div>
-  <div class="col-sm-1 col-1-harf padding-5">
+  <div class="col-sm-1 padding-5">
     <label>วันที่</label>
     <input type="text" class="form-control input-sm text-center" id="date_add" value="<?php echo date('d-m-Y'); ?>" />
   </div>
@@ -16,11 +16,11 @@
     <label class="display-block not-show">Get</label>
     <button type="button" class="btn btn-sm btn-primary btn-block" onclick="getBillDetail()">ดึงข้อมูล</button>
   </div>
-  <div class="col-sm-3 padding-5">
+  <div class="col-sm-3 col-3-harf padding-5">
     <label>ลูกค้า</label>
     <input type="text" class="form-control input-sm" id="txt-customer" />
   </div>
-  <div class="col-sm-2 padding-5">
+  <div class="col-sm-3 col-3-harf padding-5 last">
     <label>พนักงานขาย</label>
     <input type="text" class="form-control input-sm" id="txt-emp" disabled />
   </div>
@@ -35,11 +35,12 @@
   </div>
   <div class="col-sm-2 padding-5">
     <label>ชื่อโซน</label>
-    <input type="text" class="form-control input-sm" id="zoneName" placeholder="ระบุโซนที่จะรับเข้า" />
+    <input type="text" class="form-control input-sm" id="zoneName" placeholder="ระบุโซนที่จะรับเข้า" disabled/>
   </div>
   <div class="col-sm-1 padding-5 last">
     <label class="display-block not-show">change</label>
-    <button type="button" class="btn btn-sm btn-info btn-block" id="btn-change-zone" onclick="changeZone()">เปลี่ยนโซน</button>
+    <button type="button" class="btn btn-sm btn-info btn-block hide" id="btn-change-zone" onclick="changeZone()">เปลี่ยนโซน</button>
+    <button type="button" class="btn btn-sm btn-primary btn-block" id="btn-set-zone" onclick="setZone()">บันทึกโซน</button>
   </div>
   <input type="hidden" id="id_return_order" />
   <input type="hidden" id="id_customer" />

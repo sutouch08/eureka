@@ -29,9 +29,58 @@ function goAdd(id){
 
 
 
+
+function goEdit(id){
+  window.location.href = 'index.php?content=order_return&edit=Y&id_return_order='+id;
+}
+
+
+
+
 function viewDetail(id){
   window.location.href = 'index.php?content=order_return&viewDetail&id_return_order='+id;
 }
+
+
+function goDelete(id, code){
+  swal({
+      title: 'คุณแน่ใจ ?',
+      text: 'ต้องการลบเอกสาร ' + code + ' หรือไม่?',
+      type: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#DD6855',
+      confirmButtonText: 'ใช่ ฉันต้องการลบ',
+      cancelButtonText: 'ยกเลิก',
+      closeOnConfirm: false
+  }, function() {
+      $.ajax({
+          url: "controller/returnOrderController.php?deleteReturn",
+          type: "GET",
+          cache: "false",
+          data: {
+            "id_return_order": id
+          },
+          success: function(rs) {
+              var rs = $.trim(rs);
+              if (rs == 'success') {
+                  swal({
+                    title: "สำเร็จ",
+                    text: "ลบรายการเรียบร้อยแล้ว",
+                    timer: 1000,
+                    type: "success"
+                  });
+
+                  $('#row-'+id).remove();
+                  updateNo();
+              } else {
+                  swal("ข้อผิดพลาด!!", "ลบรายการไม่สำเร็จ กรุณาลองใหม่อีกครั้ง", "error");
+              }
+          }
+      });
+  });
+}
+
+
 
 
 $('#fromDate').datepicker({

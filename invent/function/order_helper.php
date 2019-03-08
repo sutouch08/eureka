@@ -81,7 +81,8 @@ function getStateIn($state)
 							'state_4'	=> 4, //-- กำลังจัดสินค้า
 							'state_5'	=> 5, //-- รอตรวจสินค้า
 							'state_11'	=> 11, //-- กำลังตรวจสินค้า
-							'state_10'	=> 10 //-- รอเปิดบิล
+							'state_10'	=> 10, //-- รอเปิดบิล
+							'state_9'	=> 9
 							);
 	foreach( $state as $key => $val )
 	{

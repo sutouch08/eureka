@@ -133,13 +133,13 @@ if( isset( $_GET['id_order'] ) ) :
         <?php		$balance		= $orderQty - $prepared;		?>
         <?php		$inZone		= $product->stock_in_zone($id_pa);	?>
         <tr style="font-size:12px;">
-        	<td align="center"><img src="<?php echo $product->get_product_attribute_image($id_pa, 1); ?>" title="<?php echo $id_pa; ?>" /></td>
-            <td><span onclick="add_barcode('<?php echo $rs['barcode']; ?>')"><?php echo $rs['barcode']; ?></span></td>
-            <td><?php echo $rs['product_reference'] .' : '.$rs['product_name']; ?></td>
-            <td align="center"><?php echo number_format($orderQty); ?></td>
-            <td align="center"><?php echo number_format($prepared); ?></td>
-            <td align="center"><?php echo number_format($balance); ?></td>
-            <td align="center">
+        	<td align="center"><img src="<?php echo $product->get_product_attribute_image($id_pa, 1); ?>" title="<?php echo $id_pa; ?>" width="50px;" /></td>
+            <td class="middle"><span onclick="add_barcode('<?php echo $rs['barcode']; ?>')"><?php echo $rs['barcode']; ?></span></td>
+            <td class="middle"><?php echo $rs['product_reference'] .' : '.$rs['product_name']; ?></td>
+            <td class="middle text-center"><?php echo number_format($orderQty); ?></td>
+            <td class="middle text-center"><?php echo number_format($prepared); ?></td>
+            <td class="middle text-center"><?php echo number_format($balance); ?></td>
+            <td class="middle text-center">
             <button type="button" class="btn btn-sm btn-default btn-pop" data-container="body" data-toggle="popover" data-placement="right" data-html="true" data-content="<?php echo $inZone; ?>" <?php echo $notShow; ?>>ที่เก็บ</button>
             <span class="zoneLabel" <?php echo $show; ?>><?php echo $inZone; ?></span>
             </td>
@@ -150,12 +150,12 @@ if( isset( $_GET['id_order'] ) ) :
         </table>
         <table style="width:100%; border:solid 1px #ccc; border-top:0px; margin-bottom:10px;">
         <tr id="finish" style="display:none;">
-           	<td align="center" style="padding:10px;">
+           	<td class="middle text-center" style="padding:10px;">
                	<button type="button" class="btn btn-sm btn-success" onClick="closeJob(<?php echo $id_order; ?>)">จัดเสร็จแล้ว</button>
             </td>
         </tr>
 		<tr id="force_close" style="display:none;">
-          	<td align="center" style="padding:10px;">
+          	<td class="middle text-center" style="padding:10px;">
            		<label style="display:block;"><input type='checkbox' id='checkboxes' onChange="getcondition()" /> สินค้ามีไม่ครบ</label>
            		<button type="button" class="btn btn-sm btn-success" id="btn_close_job" style="display:none;"  onClick="closeJob(<?php echo $id_order; ?>)">บังคับจบ</button>
 			</td>
@@ -191,12 +191,12 @@ if( isset( $_GET['id_order'] ) ) :
         <?php		$balance		= $orderQty - $prepared;		?>
         <?php 		$fromZone	= product_from_zone($id_order, $id_pa);	?>
         <tr style="font-size:12px;">
-        	<td align="center"><img src="<?php echo $product->get_product_attribute_image($id_pa, 1); ?>" /></td>
-            <td><?php echo $rs['barcode']; ?></td>
-            <td><?php echo $rs['product_reference'] .' : '.$rs['product_name']; ?></td>
-            <td align="center"><?php echo number_format($orderQty); ?></td>
-            <td align="center"><?php echo number_format($prepared); ?></td>
-            <td align="center"><?php echo number_format($balance); ?></td>
+        	<td class="middle text-center"><img src="<?php echo $product->get_product_attribute_image($id_pa, 1); ?>" width="50px;"/></td>
+            <td class="middle"><?php echo $rs['barcode']; ?></td>
+            <td class="middle"><?php echo $rs['product_reference'] .' : '.$rs['product_name']; ?></td>
+            <td class="middle text-center"><?php echo number_format($orderQty); ?></td>
+            <td class="middle text-center"><?php echo number_format($prepared); ?></td>
+            <td class="middle text-center"><?php echo number_format($balance); ?></td>
             <td>
 				<button type="button" class="btn btn-sm btn-default btn-pop" data-container="body" data-toggle="popover" data-placement="right" data-html="true" data-content="<?php echo $fromZone; ?>">
                     	จากโซน
@@ -235,15 +235,15 @@ if( isset( $_GET['id_order'] ) ) :
 		<?php		$customer  = $order->payment != 'ออนไลน์' ? $customer_name : ( $online != '' ? $customer_name.' ( '.$online.' )' : $customer_name );	?>
     <?php		$emp_name	= $rs['id_employee'] == -1 ? 'ไม่มีคนจัด' : employee_name($rs['id_employee']);	?>
     		<tr style="font-size:12px;">
-					<td align='center'><?php echo $n; ?></td>
-					<td align='center'><?php echo $order->reference; ?></td>
-					<td align='center'><?php echo $customer; ?></td>
-					<td align='center'><?php echo $order->isCOD == 1 ? 'เก็บเงินปลายทาง' : ''; //$order->role_name; ?></td>
-					<td align='center'><?php echo thaiDate($order->date_add); ?></td>
-					<td align='center'><?php echo $emp_name; ?></td>
-					<td align='center'>
-                    	<button type="button" class="btn btn-sm btn-default" onClick="continuePrepare(<?php echo $id_order; ?>, <?php echo $rs['id_employee']; ?>, <?php echo $supervisor; ?>)">จัดสินค้าต่อ</button>
-                    </td>
+					<td class="middle text-center"><?php echo $n; ?></td>
+					<td class="middle text-center"><?php echo $order->reference; ?></td>
+					<td class="middle text-center"><?php echo $customer; ?></td>
+					<td class="middle text-center"><?php echo $order->isCOD == 1 ? 'เก็บเงินปลายทาง' : ''; //$order->role_name; ?></td>
+					<td class="middle text-center"><?php echo thaiDate($order->date_add); ?></td>
+					<td class="middle text-center"><?php echo $emp_name; ?></td>
+					<td class="middle text-center">
+            <button type="button" class="btn btn-sm btn-default" onClick="continuePrepare(<?php echo $id_order; ?>, <?php echo $rs['id_employee']; ?>, <?php echo $supervisor; ?>)">จัดสินค้าต่อ</button>
+          </td>
 			</tr>
 	<?php 	$n++; ?>
     <?php	endwhile; ?>
@@ -332,13 +332,13 @@ setTimeout(function(){ goBack(); }, 60000 );
 <script id="topTableTemplate" type="text/x-handlebars-template">
 {{#each this}}
     <tr style="font-size:12px;">
-        <td align="center"><img src="{{ image }}" title="{{id_pa}}" /></td>
-        <td><span onclick="add_barcode('{{barcode}}')">{{ barcode }}</span></td>
-        <td>{{ product }}</td>
-        <td align="center">{{ orderQty }}</td>
-        <td align="center">{{ prepared }}</td>
-        <td align="center">{{ balance }}</td>
-        <td align="center">
+        <td class="middle text-center"><img src="{{ image }}" title="{{id_pa}}" /></td>
+        <td class="middle"><span onclick="add_barcode('{{barcode}}')">{{ barcode }}</span></td>
+        <td class="middle">{{ product }}</td>
+        <td class="middle text-center">{{ orderQty }}</td>
+        <td class="middle text-center">{{ prepared }}</td>
+        <td class="middle text-center">{{ balance }}</td>
+        <td class="middle text-center">
             {{#if show}}
             <button type="button" class="btn btn-sm btn-default btn-pop" data-container="body" data-toggle="popover" data-placement="right" data-html="true" data-content="{{ inZone }}" style="display:none;" >ที่เก็บ</button>
             <span class="zoneLabel">{{{ inZone }}}</span>
@@ -354,13 +354,13 @@ setTimeout(function(){ goBack(); }, 60000 );
 <script id="lastTableTemplate" type="text/x-handlebars-template">
 {{#each this}}
     <tr style="font-size:12px;">
-        <td align="center"><img src="{{ image }}" /></td>
-        <td>{{ barcode }}</td>
-        <td>{{ product }}</td>
-        <td align="center">{{ orderQty }}</td>
-        <td align="center">{{ prepared }}</td>
-        <td align="center">{{ balance }}</td>
-        <td align="center">
+        <td class="middle text-center"><img src="{{ image }}" /></td>
+        <td class="middle">{{ barcode }}</td>
+        <td class="middle">{{ product }}</td>
+        <td class="middle text-center">{{ orderQty }}</td>
+        <td class="middle text-center">{{ prepared }}</td>
+        <td class="middle text-center">{{ balance }}</td>
+        <td class="middle text-center">
             <button type="button" class="btn btn-sm btn-default btn-pop" data-container="body" data-toggle="popover" data-placement="right" data-html="true" data-content="{{ fromZone }}">ที่เก็บ</button>
         </td>
     </tr>
