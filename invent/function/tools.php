@@ -1794,6 +1794,8 @@ function newProduct($i, $id_cus=0){
 /// แสดงรายการสินค้ามาใหม่ในส่วนของ เซลล์
 function featureProduct($i, $id_cus=0)
 {
+	$sc  = '';
+
 	$qr  = "SELECT ";
 	$qr .= "pd.id_product, pd.product_code, pd.product_name, ";
 	$qr .= "pd.product_price, pd.discount_type, pd.discount, ";
@@ -1810,7 +1812,7 @@ function featureProduct($i, $id_cus=0)
 
 	if(dbNumRows($qs) > 0)
 	{
-		$sc = '<div class="row xsResponse">';
+		$sc .= '<div class="row xsResponse">';
 		while($rs = dbFetchObject($qs))
 		{
 			$product = new product();

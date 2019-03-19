@@ -694,37 +694,39 @@ function goBack() {
 
 
 function addNew() {
-    $.ajax({
-        url: "controller/orderController.php?checkOrderNotSave",
-        type: "GET",
-        cache: "false",
-        success: function(rs) {
-            var rs = $.trim(rs);
-            if (rs == 'ok') {
-                window.location.href = 'index.php?content=order&add';
-            } else {
-                window.location.href = 'index.php?content=order&add&id_order=' + rs + '&warning=ยังไม่ได้บันทึกออเดอร์นี้';
-            }
-        }
-    });
+	window.location.href = 'index.php?content=order&add=Y';
+    // $.ajax({
+    //     url: "controller/orderController.php?checkOrderNotSave",
+    //     type: "GET",
+    //     cache: "false",
+    //     success: function(rs) {
+    //         var rs = $.trim(rs);
+    //         if (rs == 'ok') {
+    //             window.location.href = 'index.php?content=order&add';
+    //         } else {
+    //             window.location.href = 'index.php?content=order&add&id_order=' + rs + '&warning=ยังไม่ได้บันทึกออเดอร์นี้';
+    //         }
+    //     }
+    // });
 }
 
-function addNewOnline()
 
+function addNewOnline()
 {
-    $.ajax({
-        url: "controller/orderController.php?checkOrderNotSave",
-        type: "GET",
-        cache: "false",
-        success: function(rs) {
-            var rs = $.trim(rs);
-            if (rs == 'ok') {
-                window.location.href = 'index.php?content=order&add&online';
-            } else {
-                window.location.href = 'index.php?content=order&add&id_order=' + rs + '&warning=ยังไม่ได้บันทึกออเดอร์นี้';
-            }
-        }
-    });
+	window.location.href = 'index.php?content=order&add&online';
+    // $.ajax({
+    //     url: "controller/orderController.php?checkOrderNotSave",
+    //     type: "GET",
+    //     cache: "false",
+    //     success: function(rs) {
+    //         var rs = $.trim(rs);
+    //         if (rs == 'ok') {
+    //             window.location.href = 'index.php?content=order&add&online';
+    //         } else {
+    //             window.location.href = 'index.php?content=order&add&id_order=' + rs + '&warning=ยังไม่ได้บันทึกออเดอร์นี้';
+    //         }
+    //     }
+    // });
 }
 
 function viewOrder(id) {

@@ -11,7 +11,7 @@
       <li class="dropdown-submenu"><a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-download"></i>  รับคืนสินค้า</a>
       	<ul class="dropdown-menu">
         	<li><a href="index.php?content=order_return"><i class="fa fa-download"></i>  รับคืนสินค้า จากการขาย(ปัจจุบัน)</a></li>
-          <li><a href="index.php?content=order_return2"><i class="fa fa-download"></i>  รับคืนสินค้า จากการขาย(อดีต)</a></li>
+<!--          <li><a href="index.php?content=order_return2"><i class="fa fa-download"></i>  รับคืนสินค้า จากการขาย(อดีต)</a></li>-->
 <!--          <li><a href="index.php?content=support_return"><i class="fa fa-download"></i>  รับคืนสินค้า จากอภินันท์</a></li> -->
 <!--          <li><a href="index.php?content=sponsor_return"><i class="fa fa-download"></i>  รับคืนสินค้า จากสปอนเซอร์</a></li>-->
         </ul>
@@ -37,7 +37,7 @@
   <li class="dropdown"> <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-shopping-bag"></i>  ระบบขาย</a>
     <ul class="dropdown-menu">
       <li><a href="index.php?content=order"><i class="fa fa-shopping-bag"></i>  ออเดอร์</a></li>
-      <li><a href="index.php?content=order_sponsor"><i class="fa fa-ticket"></i>  สปอนเซอร์ สโมสร</a></li>
+<!--      <li><a href="index.php?content=order_sponsor"><i class="fa fa-ticket"></i>  สปอนเซอร์ สโมสร</a></li>-->
 <!--      <li><a href="index.php?content=consignment"><i class="fa fa-cloud-upload"></i>  ฝากขาย</a></li> -->
 <!--      <li><a href="index.php?content=order_online"><i class="fa fa-desktop"></i>  ขายออนไลน์</a></li> -->
       <li class="divider"></li>

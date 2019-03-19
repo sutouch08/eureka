@@ -5,7 +5,7 @@ require_once "../invent/function/tools.php";
 
 function check_login()
 {
-	if( !isset($_COOKIE['user_id']) && !isset($_COOKIE['sale_id']) )
+	if( !isset($_COOKIE['user_id']) OR !isset($_COOKIE['sale_id']) )
 	{
 		header('Location: login.php');
 		exit;
@@ -71,7 +71,6 @@ require_once 'template.php';
 }
 else
 {
-	require '../invent/maintenance.php';	
+	require '../invent/maintenance.php';
 }
 ?>
-

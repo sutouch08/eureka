@@ -1,59 +1,155 @@
-<?php 
-require_once '../library/config.php';
-require_once '../library/functions.php';
-
-$errorMessage = '&nbsp;';
-
-if (isset($_POST['txtUserName'])) {
-	$result = doLogin();
-	
-	if ($result != '') {
-		$errorMessage = $result;
-	}
-}
-
-?>
-
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="">
-    <meta name="author" content="">
-    <link rel="shortcut icon" href="favicon.png">
+<head>
+	<title>Login</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+<!--===============================================================================================-->
+	<link rel="icon" type="image/png" href="../library/images/icons/favicon.ico"/>
+<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="../library/vendor/bootstrap/css/bootstrap.min.css">
+<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="../library/fonts/font-awesome-4.7.0/css/font-awesome.min.css">
+<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="../library/fonts/iconic/css/material-design-iconic-font.min.css">
+<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="../library/vendor/animate/animate.css">
+<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="../library/vendor/css-hamburgers/hamburgers.min.css">
+<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="../library/vendor/animsition/css/animsition.min.css">
+<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="../library/vendor/select2/select2.min.css">
+<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="../library/vendor/daterangepicker/daterangepicker.css">
+<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="../library/css/util.css">
+	<link rel="stylesheet" type="text/css" href="../library/css/main.css">
+<!--===============================================================================================-->
+</head>
+<body>
 
-    <title>Sign in</title>
+	<div class="limiter">
+		<div class="container-login100">
+			<div class="wrap-login100 p-t-85 p-b-20">
+				<form class="login100-form validate-form">
+					<span class="login100-form-title p-b-70">
+						Welcome
+					</span>
+					<span class="login100-form-avatar">
+						<img src="../library/images/vf.jpg" alt="AVATAR">
+					</span>
 
-    <!-- core CSS -->
-    <link href="../library/css/bootstrap.css" rel="stylesheet">
+					<div class="wrap-input100 validate-input m-t-85 m-b-35" data-validate = "Enter username">
+						<input class="input100" type="text" name="txtUserName" id="txtUserName" autofocus>
+						<span class="focus-input100" data-placeholder="Username"></span>
+					</div>
 
-    <!-- Custom styles for this template -->
-    <link href="../library/css/signin.css" rel="stylesheet">
+					<div class="wrap-input100 validate-input m-b-50" data-validate="Enter password">
+						<input class="input100" type="password" name="txtPassword" id="txtPassword">
+						<span class="focus-input100" data-placeholder="Password"></span>
 
-    <!-- Just for debugging purposes. Don't actually copy this line! -->
-    <!--[if lt IE 9]><script src="../../docs-assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
+					</div>
 
-    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
-    <!--[if lt IE 9]>
-      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-      <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
-    <![endif]-->
-  </head>
+					<div class="container-login100-form-btn">
+						<button type="button" class="login100-form-btn" onclick="doLogin()">
+							Login
+						</button>
+					</div>
 
-  <body>
+					<div class="container-login100-form-btn" style="margin-top:30px;">
+						<p id="error" class="text-center" style="color:red"></p>
+					</div>
 
-    <div class="container">
+					<ul class="login-more p-t-190">
+						<li class="m-b-8">
+							<span class="txt1">
+								พนักงานขาย :
+							</span>
 
-      <form method="post" class="form-signin" role="form" >
-        <h2 class="form-signin-heading" align="center"><?php echo COMPANY ; ?></h2>
-        <input type="text" class="form-control" name="txtUserName" placeholder="Email OR User Name" autocomplete="false" required autofocus>
-        <input type="password" class="form-control" name="txtPassword" placeholder="Password" required>
-        <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button><br/>
-        <p class="pull-right"><a href="#">Forgot Password? </a></p>
-      </form>
+							<a href="../sale/index.php" class="txt2">
+								ไปหน้าพนักงานขาย
+							</a>
+						</li>
 
-    </div> 
-  </body>
+					</ul>
+				</form>
+			</div>
+		</div>
+	</div>
+
+
+	<div id="dropDownSelect1"></div>
+
+<!--===============================================================================================-->
+	<script src="../library/vendor/jquery/jquery-3.2.1.min.js"></script>
+<!--===============================================================================================-->
+	<script src="../library/vendor/animsition/js/animsition.min.js"></script>
+<!--===============================================================================================-->
+	<script src="../library/vendor/bootstrap/js/popper.js"></script>
+	<script src="../library/vendor/bootstrap/js/bootstrap.min.js"></script>
+<!--===============================================================================================-->
+	<script src="../library/vendor/select2/select2.min.js"></script>
+<!--===============================================================================================-->
+	<script src="../library/vendor/daterangepicker/moment.min.js"></script>
+	<script src="../library/vendor/daterangepicker/daterangepicker.js"></script>
+<!--===============================================================================================-->
+	<script src="../library/vendor/countdowntime/countdowntime.js"></script>
+<!--===============================================================================================-->
+	<script src="../library/js/main.js"></script>
+	<script>
+	function doLogin(){
+		var userName = $('#txtUserName').val();
+		var pwd = $('#txtPassword').val();
+		if(userName.length == 0){
+			$('#txtUserName').focus();
+			return false;
+		}
+
+		if(pwd.length == 0){
+			$('#txtPassword').focus();
+			return false;
+		}
+
+		$.ajax({
+			url:'controller/loginController.php?doLogin',
+			type:'POST',
+			cache:'false',
+			data:{
+				'txtUserName' : userName,
+				'txtPassword' : pwd
+			},
+			success:function(rs){
+				var rs = $.trim(rs);
+				if(rs == 'success'){
+					window.location.href = 'index.php';
+				}else{
+					$('#error').text(rs);
+					$('#txtUserName').focus();
+				}
+			}
+		});
+	}
+
+
+	$('#txtUserName').keyup(function(e){
+		if(e.keyCode == 13){
+			if($(this).val() != ''){
+				$('#txtPassword').focus();
+			}
+		}
+	});
+
+
+	$('#txtPassword').keyup(function(e){
+		if(e.keyCode == 13){
+			if($(this).val() != '' && $('#txtUserName').val() != ''){
+				doLogin();
+			}
+		}
+	});
+
+
+	</script>
+</body>
 </html>

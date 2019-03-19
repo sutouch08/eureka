@@ -17,7 +17,7 @@ if(isset($_GET['error'])){
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="">
     <meta name="author" content="">
-    <link rel="shortcut icon" href="favicon.png">
+    <link rel="shortcut icon" href="../favicon.ico">
 
     <title>Sign in</title>
 
@@ -38,10 +38,9 @@ if(isset($_GET['error'])){
   </head>
 
   <body>
-
     <div class="container">
       <form method="post" class="form-signin" role="form" >
-        <h2 class="form-signin-heading" align="center"><?php // echo COMPANY ; ?></h2>
+        <h2 class="form-signin-heading" align="center"><?php  echo COMPANY ; ?></h2>
         <input type="text" class="form-control" style='margin-bottom:10px;' name="txtUserName" placeholder="Email OR User Name" required autofocus>
         <input type="password" class="form-control" name="txtPassword" placeholder="Password" required>
         <input type='checkbox' name='remember' id='remember' /><label for="remember" style='margin-left:10px;'>Remember me</label>
@@ -49,6 +48,6 @@ if(isset($_GET['error'])){
         <p class="pull-right"><a href="#">Forgot Password? </a></p>
       </form>
     <?php 	if(isset($error_message)){ echo"<div class='row'><div class='col-lg-6 col-lg-offset-3'><div class='alert alert-danger'>$error_message</div></div></div>"; } ?>
-    </div> 
+    </div>
   </body>
 </html>
