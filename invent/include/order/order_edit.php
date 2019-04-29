@@ -16,9 +16,9 @@
 <div class="row">
 	<div class="col-sm-12">
     	<h5 class="title">
-		<?php 	echo $order->reference." - ";  	if($order->id_customer != "0") : echo $customer->full_name; endif; ?>
+		<?php 	echo $order->reference." - ";  	if($order->id_customer != "0") : echo customer_name($order->id_customer); endif; ?>
         <?php 	if( $online && $onlineCustomer != '') : echo ' ( '.$onlineCustomer.' ) '; endif; ?>
-        <p class='pull-right'>พนักงาน : &nbsp; <?php echo $sale->full_name; ?></p>
+        <p class='pull-right'>พนักงานขาย : &nbsp; <?php echo $sale->full_name; ?></p>
         </h5>
     </div>
 </div>

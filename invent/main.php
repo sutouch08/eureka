@@ -8,14 +8,14 @@
 		include "../library/popup.php";
 		$today = date('Y-m-d H:i:s');
 		if(isset($_COOKIE['pop_back'])&&$_COOKIE['pop_back'] !=$delay){ setcookie('pop_back','',time()-3600); }
-		if($start<=$today &&$end>=$today){  
+		if($start<=$today &&$end>=$today){
 			if(!isset($_COOKIE['pop_back'])){
 				setcookie("pop_back", $delay, time()+$delay);
 				echo" <script> $(document).ready(function(e) {  $('#modal_popup').modal('show'); }); </script>";
 			}
 		}
 	}
-		
+
 ?>
 <div class='container'>
 	<div class='row margin-top-15'>
@@ -94,11 +94,11 @@
 <script>
 function popin(el)
 {
-	el.popover('show');	
+	el.popover('show');
 }
 function popout(el)
 {
-	el.popover('hide');	
+	el.popover('hide');
 }
 
 $("#search-text").keyup(function(e){
@@ -121,7 +121,7 @@ function checkBarcode(){
 				var output = $("#result");
 				render(source, data, output);
 			}
-		});	
+		});
 	}
 }
 
@@ -145,5 +145,5 @@ function get_search()
 		});
 	}
 }
-	
+
 </script>

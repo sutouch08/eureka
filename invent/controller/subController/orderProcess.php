@@ -9,7 +9,7 @@ if( dbNumRows($qs) > 0 )
 	$product 	= new product();
 	while( $rs = dbFetchObject($qs) )
 	{
-		set_time_limit(60);
+		//set_time_limit(60);
 		//--- id_product_attribute
 		$id_pa		= $rs->id_product_attribute;
 

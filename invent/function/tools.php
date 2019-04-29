@@ -3393,7 +3393,7 @@ function customer_name($id_customer){
 	if(dbNumRows($qs) == 1)
 	{
 		$rs = dbFetchArray($qs);
-		if($rs['company'] == "")
+		if($rs['company'] != "")
 		{
 			return $rs['company'];
 		}

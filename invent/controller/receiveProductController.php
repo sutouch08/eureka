@@ -151,15 +151,15 @@ if(isset($_GET['getPoDetail']))
 		$no = 1;
 		while($rs = dbFetchObject($qs))
 		{
-			$qty = ($rs->qty - $rs->received);
-			$qty = $qty > 0 ? $qty : '';
+			//$qty = ($rs->qty - $rs->received);
+			//$qty = $qty > 0 ? $qty : '';
 			$arr = array(
 				'no' => $no,
 				'id_pd' => $rs->id_product,
 				'id_pa' => $rs->id_product_attribute,
 				'pdCode' => $rs->reference,
 				'pdName' => $rs->product_name,
-				'qty' => $qty
+				'qty' => ''//$qty
 			);
 			array_push($ds, $arr);
 			$no++;
@@ -705,6 +705,12 @@ if( isset($_GET['get_zone'] ) && isset( $_POST['barcode'] ) )
 
 
 
+
+if(isset($_GET['printBarcode']) && isset($_GET['id_receive_product']))
+{
+	include '../function/print_helper.php';
+	include '../print/receive_product/print_receive_barcode.php';
+}
 
 
 

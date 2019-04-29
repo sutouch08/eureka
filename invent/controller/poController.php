@@ -297,7 +297,7 @@ if( isset( $_GET['get_product'] ) && isset( $_POST['product_code'] ) )
 	{
 		$product = new product();
 		$product->product_detail($id_product);
-		$config = "size";
+		$config = "color";
 		$sqr = dbQuery("SELECT id_$config FROM tbl_product_attribute WHERE id_product = $id_product AND id_$config !=0 GROUP BY id_$config");
 		$colums = dbNumRows($sqr);
 		$sqm = dbQuery("SELECT id_color, id_size, id_attribute FROM tbl_product_attribute WHERE id_product = $id_product LIMIT 1");
@@ -306,7 +306,7 @@ if( isset( $_GET['get_product'] ) && isset( $_POST['product_code'] ) )
 		if($si !=0){ $si = 1;}
 		if($at !=0){ $at = 1;}
 		$count = $co+$si+$at;
-		if($count >1){	$table_w = (85*($colums+1)+100); }else if($count ==1){ $table_w = 400; }
+		if($count >1){	$table_w = (70*($colums+1)+100); }else if($count ==1){ $table_w = 400; }
 		if($table_w < 400){ $table_w = 400; }
 		$dataset = $product->request_attribute_grid($id_product);
 		$dataset .= "|".$table_w;

@@ -9,7 +9,14 @@ if( isset( $_GET['getTopTable'] ) )
 {
 	$sc = 'fail';
 	$id_order 	= $_POST['id_order'];
-	$qs = dbQuery("SELECT tbl_order_detail.* FROM tbl_order_detail JOIN tbl_product ON tbl_order_detail.id_product = tbl_product.id_product WHERE id_order = ".$id_order." AND valid_detail = 0 AND is_visual = 0 ORDER BY id_product_attribute ASC");
+	$qr  = "SELECT od.* FROM tbl_order_detail AS od ";
+	$qr .= "JOIN tbl_product AS pd ON od.id_product = pd.id_product ";
+	$qr .= "WHERE id_order = ".$id_order." ";
+	$qr .= "AND valid_detail = 0 ";
+	$qr .= "AND is_visual = 0 ";
+	$qr .= "ORDER BY id_product_attribute ASC";
+
+	$qs = dbQuery($qr);
 	if( dbNumRows($qs) > 0 )
 	{
 		$ds 		= array();
@@ -129,7 +136,7 @@ if( isset( $_GET['perparedItem'] ) )
 
 				//-------------------  ถ้าไม่มีข้อผิดพลาด  ---------------//
 				//$ra = insert_to_temp($id_order, $id_pa, $qty, $id_wh, $id_zone, 1, $id_emp);
-				if($temp->updatePrepare($id_order, $id_pa, $qty, $id_wh, $id_zone) === FALSE)
+				if($temp->updatePrepare($id_order, $id_pa, $id_wh, $id_zone, $qty) === FALSE)
 				{
 					$sc = FALSE;
 					$message = $temp->error;

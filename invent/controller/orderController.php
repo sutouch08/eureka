@@ -815,26 +815,51 @@ if ($result->num_rows>0)
 	}
 
 }
+
+
 ///////////////////  AutoComplete //////////////////////
-if(isset($_GET['customer_name'])&&isset($_REQUEST['term'])){
-	if($_REQUEST['term'] =="*"){
-		$qstring = "SELECT id_customer, customer_code, first_name, last_name FROM tbl_customer";
-	}else{
-	$qstring = "SELECT id_customer, customer_code, first_name, last_name FROM tbl_customer WHERE customer_code LIKE '%".$_REQUEST['term']."%' OR first_name LIKE '%".$_REQUEST['term']."%' OR last_name LIKE '%".$_REQUEST['term']."%' ORDER BY customer_code ASC";
+if(isset($_GET['customer_name'])&&isset($_REQUEST['term']))
+{
+	if($_REQUEST['term'] =="*")
+	{
+		$qstring = "SELECT id_customer, customer_code, company, first_name, last_name FROM tbl_customer";
 	}
+	else
+	{
+	$qstring = "SELECT
+								id_customer, customer_code, company, first_name, last_name
+							FROM
+								tbl_customer
+							WHERE
+								customer_code LIKE '%".$_REQUEST['term']."%'
+							OR
+								company LIKE '%".$_REQUEST['term']."%'
+							OR
+								first_name LIKE '%".$_REQUEST['term']."%'
+							OR
+								last_name LIKE '%".$_REQUEST['term']."%'
+							ORDER BY customer_code ASC";
+	}
+
 	$result = dbQuery($qstring);//query the database for entries containing the term
+
 if ($result->num_rows>0)
 	{
 		$data= array();
 	while($row = $result->fetch_array())//loop through the retrieved values
-		{
-				$data[] = $row['customer_code']." | ".$row['first_name']." ".$row['last_name']." | ".$row['id_customer'];
-		}
+	{
+		$name = $row['company'] != ''? $row['company'] : $row['first_name'].' '.$row['last_name'];
+		$data[] = $row['customer_code']." | ".$name." | ".$row['id_customer'];
+	}
 		echo  json_encode($data);//format the array into json data
-	}else {
+	}
+	else
+	{
 		echo "error";
 	}
 }
+
+
 ///////////////////  AutoComplete //////////////////////
 if(isset($_GET['product_code'])&&isset($_REQUEST['term'])){
 	if($_REQUEST['term']=="*"){
@@ -1341,15 +1366,41 @@ if( isset( $_GET['print_order']) && isset( $_GET['id_order'] ) )
 	$print 		= new printer();
 	$doc			= doc_type($order->role);
 	$onlineCustomer = getCustomerOnlineReference($id_order);
+	$address = new address();
+	$adr = $address->getAddressByCustomer($order->id_customer);
 	$cusName = $onlineCustomer == '' ? customer_name($order->id_customer) : customer_name($order->id_customer).' ['.$onlineCustomer.']';
-	echo $print->doc_header();
+	$transport = new transport();
+	$sender = $transport->getMainSenderName($order->id_customer);
+	$emp = new employee($order->id_employee);
+
+	$saleName = sale_name($order->id_sale);
+	$sc = "";
+	$sc .= $print->doc_header();
+
 	$print->add_title($doc['title']);
-	$header		= array("ลูกค้า"=>$cusName, "วันที่"=>thaiDate($order->date_add), "พนักงานขาย"=>sale_name($order->id_sale), "เลขที่เอกสาร"=>$order->reference);
+
+	$header		= array(
+								"ลูกค้า"=>$cusName,
+								"วันที่"=>thaiDate($order->date_add),
+								"จังหวัด" => $adr === FALSE ? 'ไม่พบที่อยู่' : $adr['city'],
+								"เลขที่เอกสาร"=> $order->reference,
+								"ขนส่ง" => $sender == '' ? 'ไม่พบขนส่ง' : $sender,
+								"พนักงานขาย"=> $saleName == '' ? 'ยังไม่ได้ผูก' : $saleName,
+								"ผู้คีย์ข้อมูล" => $emp->full_name
+							);
+
 	$print->add_header($header);
 	$detail 		= dbQuery("SELECT * FROM tbl_order_detail WHERE id_order = ".$id_order);
 	$total_row 	= dbNumRows($detail);
-	$config 		= array("footer"=>false, "total_row"=>$total_row, "font_size"=>10, "sub_total_row"=>4);
+	$config 		= array(
+									"footer" =>TRUE,
+									"total_row"	=>$total_row,
+									"font_size"	=> 10,
+									"sub_total_row"	=> 4
+								);
+
 	$print->config($config);
+
 	$row 			= $print->row;
 	$total_page 	= $print->total_page;
 	$total_qty 	= 0;
@@ -1373,18 +1424,17 @@ if( isset( $_GET['print_order']) && isset( $_GET['id_order'] ) )
 	$pattern = array(
 							"text-align: center; border-top:0px;",
 							"border-left: solid 1px #ccc; border-top:0px; padding:0px; text-align:center; vertical-align:middle;",
-							"border-left: solid 1px #ccc; border-top:0px;",
-							"text-align:center; border-left: solid 1px #ccc; border-top:0px;",
-							"text-align:center; border-left: solid 1px #ccc; border-top:0px;",
-							"text-align:center; border-left: solid 1px #ccc; border-top:0px;",
-							"text-align:right; border-left: solid 1px #ccc; border-top:0px;"
+							"border-left: solid 1px #ccc; border-top:0px; font-size:12px;",
+							"text-align:center; border-left: solid 1px #ccc; border-top:0px; font-size:12px;",
+							"text-align:center; border-left: solid 1px #ccc; border-top:0px; font-size:12px;",
+							"text-align:center; border-left: solid 1px #ccc; border-top:0px;font-size:12px;",
+							"text-align:right; border-left: solid 1px #ccc; border-top:0px;font-size:12px;"
 							);
 	$print->set_pattern($pattern);
 
 	//*******************************  กำหนดช่องเซ็นของ footer *******************************//
 	$footer	= array(
-						array("ผู้รับของ", "ได้รับสินค้าถูกต้องตามรายการแล้ว","วันที่............................."),
-						array("ผู้ส่งของ", "","วันที่............................."),
+						array("ผู้จัดทำ", "","วันที่............................."),
 						array("ผู้ตรวจสอบ", "","วันที่............................."),
 						array("ผู้อนุมัติ", "","วันที่.............................")
 						);
@@ -1393,10 +1443,10 @@ if( isset( $_GET['print_order']) && isset( $_GET['id_order'] ) )
 	$n = 1;
 	while($total_page > 0 )
 	{
-		echo $print->page_start();
-			echo $print->top_page();
-			echo $print->content_start();
-				echo $print->table_start();
+		$sc .= $print->page_start();
+		$sc .= $print->top_page();
+		$sc .= $print->content_start();
+		$sc .= $print->table_start();
 				$i = 0;
 				$product = new product();
 				while($i<$row) :
@@ -1417,10 +1467,13 @@ if( isset( $_GET['print_order']) && isset( $_GET['id_order'] ) )
 					else :
 						$data = array("", "", "", "", "", "","");
 					endif;
-					echo $print->print_row($data);
-					$n++; $i++;
+					$sc .= $print->print_row($data);
+					$n++;
+					$i++;
 				endwhile;
-				echo $print->table_end();
+
+				$sc .= $print->table_end();
+
 				if($print->current_page == $print->total_page)
 				{
 					$qty 			= number_format($total_qty);
@@ -1428,13 +1481,16 @@ if( isset( $_GET['print_order']) && isset( $_GET['id_order'] ) )
 					$all_disc		= number_format($total_discount+$bill_discount,2);
 					$net_amount	= number_format($total_amount - $bill_discount ,2);
 					$remark 		= $order->comment;
-				}else{
+				}
+				else
+				{
 					$qty 			= "";
 					$amount		= "";
 					$all_disc		= "";
 					$net_amount	= "";
 					$remark 		= "";
 				}
+
 				$sub_total = array(
 						array("<td style='height:".$print->row_height."mm; border: solid 1px #ccc; border-bottom:0px; border-left:0px; width:60%; text-align:center;'>**** ส่วนลดท้ายบิล : ".number_format($bill_discount,2)." ****</td>
 								<td style='width:20%; height:".$print->row_height."mm; border: solid 1px #ccc;'><strong>จำนวนรวม</strong></td>
@@ -1447,13 +1503,16 @@ if( isset( $_GET['print_order']) && isset( $_GET['id_order'] ) )
 						array("<td style='height:".$print->row_height."mm; border: solid 1px #ccc; border-bottom:0px;'><strong>ยอดเงินสุทธิ</strong></td>
 						<td style='height:".$print->row_height."mm; border: solid 1px #ccc; border-right:0px; border-bottom:0px; border-bottom-right-radius:10px; text-align:right;'>".$net_amount."</td>")
 						);
-			echo $print->print_sub_total($sub_total);
-			echo $print->content_end();
-			echo $print->footer;
-		echo $print->page_end();
-		$total_page --; $print->current_page++;
+			$sc .= $print->print_sub_total($sub_total);
+			$sc .= $print->content_end();
+			$sc .= $print->footer;
+		 	$sc .= $print->page_end();
+			$total_page --;
+			$print->current_page++;
 	}
-	echo $print->doc_footer();
+	$sc .= $print->doc_footer();
+
+	echo $sc;
 }
 
 

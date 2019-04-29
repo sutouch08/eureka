@@ -322,7 +322,7 @@ if( isset( $_GET['printAddressSheet'] ) && isset( $_GET['id_customer'] ) )
 	$cAddress		= getConfig('COMPANY_ADDRESS');
 	$cPhone			= getConfig('COMPANY_PHONE');
 	/*********  Sender  ***********/
-	$sender			= '<div class="col-lg-12" style="font-size:18px; padding-top:15px; padding-bottom:30px;">';
+	$sender			 = '<div class="col-lg-12" style="font-size:18px; padding-top:15px; padding-bottom:30px;">';
 	$sender			.= '<span style="display:block; margin-bottom:10px;">'.$cName.'</span>';
 	$sender			.= '<span style="width:70%; display:block;">'.$cAddress.' '.getConfig('COMPANY_POST_CODE').'</span>';
 	$sender			.= '<span style="display:block"> โทร. '.$cPhone.'</span>';
@@ -330,7 +330,7 @@ if( isset( $_GET['printAddressSheet'] ) && isset( $_GET['id_customer'] ) )
 	/********* / Sender *************/
 
 	/*********** Receiver  **********/
-	$receiver		= '<div class="col-lg-12" style="font-size:18px; padding-left: 250px; padding-top:15px; padding-bottom:40px;">';
+	$receiver		 = '<div class="col-lg-12" style="font-size:18px; padding-left: 250px; padding-top:15px; padding-bottom:40px;">';
 	$receiver		.= '<span style="display:block; margin-bottom:10px;">'.$cusName.'</span>';
 	$receiver		.= '<span style="display:block;">'.$ad['address1'].'</span>';
 	$receiver		.= '<span style="display:block;">'.$ad['address2'].'</span>';
@@ -344,7 +344,7 @@ if( isset( $_GET['printAddressSheet'] ) && isset( $_GET['id_customer'] ) )
 	$transport = '';
 	if( $sd !== FALSE )
 	{
-		$transport	= '<table style="width:100%; border:0px; margin-left: 30px; position: relative; bottom:1px;">';
+		$transport	 = '<table style="width:100%; border:0px; margin-left: 30px; position: relative; bottom:1px;">';
 		$transport	.= '<tr style="font-18px;"><td>'. $sd['name'] .'</td></tr>';
 		$transport	.= '<tr style="font-18px;"><td>'. $sd['address1'] .' '.$sd['address2'].'</td></tr>';
 		$transport	.= '<tr style="font-18px;"><td>โทร. '. $sd['phone'] .' เวลาทำการ : '.date('H:i', strtotime($sd['open'])).' - '.date('H:i', strtotime($sd['close'])).' น. - ( '.$sd['type'].')</td></tr>';
@@ -353,7 +353,7 @@ if( isset( $_GET['printAddressSheet'] ) && isset( $_GET['id_customer'] ) )
 
 	/*********** / transport **********/
 
-	$boxes 			= countBoxes($id_order);
+	$boxes 			= 1; //countBoxes($id_order);
 	$total_page		= $boxes <= 1 ? 1 : ($boxes+1)/2;
 	$Page = '';
 
@@ -411,7 +411,7 @@ if( isset( $_GET['printAddressSheet'] ) && isset( $_GET['id_customer'] ) )
 			}
 			$n++;
 		}
-		
+
 		$Page .= $printer->page_end();
 
 		$total_page--;

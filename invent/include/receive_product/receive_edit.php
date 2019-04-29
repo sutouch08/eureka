@@ -90,6 +90,7 @@
           <th class="width-5 text-center">No.</th>
           <th class="width-15 text-center">รหัส</th>
           <th class="text-center">สินค้า</th>
+          <th class="width-10 text-center">ค้างรับ</th>
           <th class="width-10 text-center">รับ</th>
           <th class="width-5 text-center">Actions</th>
         </thead>
@@ -105,11 +106,12 @@
               <td class="text-center middle no"><?php echo $no; ?></td>
               <td class="middle"><?php echo $rs->reference; ?></td>
               <td class="middle"><?php echo $rs->product_name; ?></td>
+              <td class="middle text-center"><?php echo number($qty); ?></td>
               <td class="middle text-center">
                 <?php if(isset($rs->status)) : ?>
                   <span class="received-item"><?php echo $qty; ?></span>
                 <?php else : ?>
-                <input type="number" class="form-control input-sm text-center receive-box" id="receive-<?php echo $id_pa; ?>" value="<?php echo $qty; ?>" />
+                <input type="number" class="form-control input-sm text-center receive-box" id="receive-<?php echo $id_pa; ?>" value="<?php //echo $qty; ?>" />
                 <span class="hide" id="label-<?php echo $id_pa; ?>"><?php echo $qty; ?></span>
                 <input type="hidden" id="productId-<?php echo $id_pa; ?>" value="<?php echo $id_pd; ?>" />
                 <?php endif; ?>

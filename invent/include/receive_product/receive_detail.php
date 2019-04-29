@@ -13,6 +13,7 @@ $qs = $rd->getDetails($rd->id_receive_product);
       <p class="pull-right top-p">
         <button type="button" class="btn btn-sm btn-warning" onclick="goBack()"><i class="fa fa-arrow-left"></i> กลับ</button>
         <button type="button" class="btn btn-sm btn-info" onclick="printReceived(<?php echo $rd->id_receive_product; ?>)"><i class="fa fa-print"></i> พิมพ์</button>
+        <button type="button" class="btn btn-sm btn-info" onclick="printReceivedBarcode(<?php echo $rd->id_receive_product; ?>)"><i class="fa fa-barcode"></i> พิมพ์บาร์โค้ด</button>
       </p>
     </div>
   </div>

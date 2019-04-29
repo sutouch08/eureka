@@ -9,25 +9,31 @@
 	$wh			= $whOption == 1 ? $_POST['wh'] : FALSE;
 	$date 		= $dateOption == 1 ? dbDate($_POST['date']) : date('Y-m-d');
 	$whList		= $whOption == 1 ? warehouseIn($wh) : warehouseIn($wh, TRUE);
-	
+
 	$pdQuery 	= $pdOption == 1 ? "AND product_code >= '".$pdFrom."' AND product_code <= '".$pdTo."' " : "";
 	$whQuery	= $whOption == 1 && $whList !== FALSE ? "AND id_warehouse IN(".$whList.") " : '';
-	
+
 	if( $pdOption == 0 )
 	{
-		$qr = "SELECT id_product_attribute, barcode, reference, product_name, cost FROM tbl_product_attribute ";
-		$qr .= "JOIN tbl_product ON tbl_product_attribute.id_product = tbl_product.id_product ";
-		$qr .= "ORDER BY tbl_product_attribute.id_product ASC";
+		$qr = "SELECT pa.id_product_attribute, pa.barcode, pa.reference, pd.product_name, pa.cost ";
+		$qr .= "FROM tbl_product_attribute AS pa ";
+		$qr .= "JOIN tbl_product AS pd ON pa.id_product = pd.id_product ";
+		$qr .= "LEFT JOIN tbl_color AS co ON pa.id_color = co.id_color ";
+		$qr .= "LEFT JOIN tbl_size AS si ON pa.id_size = si.id_size ";
+		$qr .= "ORDER BY pa.id_product ASC, co.color_code ASC, si.position ASC";
 	}
 	else
 	{
-		$qr = "SELECT id_product_attribute, barcode, reference, product_name, cost FROM tbl_product_attribute ";
-		$qr .= "JOIN tbl_product ON tbl_product_attribute.id_product = tbl_product.id_product ";
-		$qr .= "WHERE tbl_product_attribute.id_product != 0 ";
+		$qr = "SELECT pa.id_product_attribute, pa.barcode, pa.reference, pd.product_name, pa.cost ";
+		$qr .= "FROM tbl_product_attribute AS pa ";
+		$qr .= "JOIN tbl_product AS pd ON pa.id_product = pd.id_product ";
+		$qr .= "LEFT JOIN tbl_color AS co ON pa.id_color = co.id_color ";
+		$qr .= "LEFT JOIN tbl_size AS si ON pa.id_size = si.id_size ";
+		$qr .= "WHERE pa.id_product != 0 ";
 		$qr .= $pdQuery;
-		$qr .= "ORDER BY tbl_product_attribute.id_product ASC";
+		$qr .= "ORDER BY pa.id_product ASC, co.color_code ASC, si.position ASC";
 	}
-	
+
 	$qs = dbQuery($qr);
 	$ds = array();
 	if( dbNumRows($qs) > 0 )
@@ -66,7 +72,7 @@
 				array_push($ds, $arr);
 				$total_qty += $qty;
 				$total_amount += ($qty * $rs->cost);
-				$n++;	
+				$n++;
 			}
 		}
 		$arr = array("total_qty" => number_format($total_qty), "total_amount" => number_format($total_amount, 2));
@@ -85,7 +91,7 @@
 							);
 		array_push($ds, $arr);
 		$arr = array("total_qty" => number_format($total_qty), "total_amount" => number_format($total_amount, 2));
-		array_push($ds, $arr);	
-	}	
+		array_push($ds, $arr);
+	}
 	echo json_encode($ds);
 	?>

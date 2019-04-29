@@ -11,7 +11,7 @@ if( dbNumRows($qs) > 0 )
 
 	while( $rs = dbFetchObject($qs) )
 	{
-		set_time_limit(60);
+		//set_time_limit(60);
 		$id_pa		= $rs->id_product_attribute;
 
 		//---- ถ้าเป็นสินค้าที่นับสต็อก บันทึกขาย update buffer บันทึก movement

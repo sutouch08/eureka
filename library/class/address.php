@@ -14,7 +14,7 @@ class address
 	public $phone;
 	public $remark;
 	public $error = FALSE;
-	
+
 	public function __construct($id = '')
 	{
 		if( $id != '')
@@ -42,14 +42,14 @@ class address
 			}
 		}
 	}
-	
+
 	public function insertAddress(array $ds)
 	{
 		$qs = "INSERT INTO tbl_address (id_customer, alias, company, first_name, last_name, address1, address2, city, postcode, phone, remark) VALUES ";
 		$qs .= "(".$ds['id_customer'].", '".$ds['alias']."', '".$ds['company']."', '".$ds['first_name']."', '".$ds['last_name']."', '".$ds['address1']."', '".$ds['address2']."', '".$ds['city']."', '".$ds['postcode']."', '".$ds['phone']."', '".$ds['remark']."')";
 		return dbQuery($qs);
 	}
-	
+
 	public function updateAddress($id, array $ds)
 	{
 		$qs = "UPDATE tbl_address SET id_customer = ".$ds['id_customer'].",  alias = '".$ds['alias']."', company = '".$ds['company']."', first_name =  '".$ds['first_name']."', ";
@@ -57,10 +57,22 @@ class address
 		$qs .= " WHERE id_address = ".$id;
 		return dbQuery($qs);
 	}
-	
+
 	public function deleteAddress($id)
 	{
-		return dbQuery("DELETE FROM tbl_address WHERE id_address = ".$id);	
+		return dbQuery("DELETE FROM tbl_address WHERE id_address = ".$id);
+	}
+
+	public function getAddressByCustomer($id_customer)
+	{
+		$qr = "SELECT * FROM tbl_address WHERE id_customer = ".$id_customer." LIMIT 1";
+		$qs = dbQuery($qr);
+		if(dbNumRows($qs) == 1)
+		{
+			return dbFetchArray($qs);
+		}
+
+		return FALSE;
 	}
 }/// end class
 

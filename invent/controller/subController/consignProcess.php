@@ -19,7 +19,7 @@ else
 		$movement = new movement();
 		while( $rs = dbFetchObject($qs) )
 		{
-			set_time_limit(60);
+			//set_time_limit(60);
 
 
 			if($rs->is_visual == 0)

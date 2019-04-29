@@ -125,6 +125,15 @@ function printReceived(id)
 }
 
 
+function printReceivedBarcode(id)
+{
+  //--- properties for print
+  var center    = ($(document).width() - 800)/2;
+  var prop 			= "width=800, height=900. left="+center+", scrollbars=yes";
+  var target = 'controller/receiveProductController.php?printBarcode&id_receive_product='+id;
+	window.open(target, "_blank", prop);
+}
+
 
 
 function clearFilter(){

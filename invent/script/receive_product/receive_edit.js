@@ -5,7 +5,7 @@ function saveEdit(){
   var unSaveItem = $('.receive-box').length; //--- รายการที่ยังไม่บันทึก
   var savedItem = $('.received-item').length;
   var max = unSaveItem + savedItem;
-
+  var total = 0;
   if(isNaN(parseInt(id_zone))){
     swal("โซนไม่ถูกต้อง");
     return false;
@@ -22,14 +22,31 @@ function saveEdit(){
     $('.receive-box').each(function(index){
       let arr = $(this).attr('id').split('-');
       let id_pa = arr[1];
-      if(receiveItem(id, id_po, id_zone, id_pa) === false){
+      let res = receiveItem(id, id_po, id_zone, id_pa);
+      if( res === false){
+        $('#btn-save').removeAttr('disabled');
+        $('#btn-change-zone').removeAttr('disabled');
         return false;
+      }else if(res === true){
+        total++;
+        if(total == unSaveItem){
+          review();
+        }
       }
     });
 
     load_out();
+    if(total == 0){
+      $('#btn-save').removeAttr('disabled');
+      $('#btn-change-zone').removeAttr('disabled');
+       swal('กรุณาระบุจำนวนที่จะรับเข้า');
+       return false;
+    }else{
+      setTimeout(function(){
+        review();
+      },1500);
+    }
 
-    review();
   }
 }
 
@@ -76,11 +93,14 @@ function updateReceiveProduct(){
 
 function receiveItem(id, id_po, id_zone, id_pa){
   var qty = parseInt($('#receive-'+id_pa).val());
+  if(isNaN(qty) || qty < 0){
+    qty = 0;
+  }
+
   var id_pd = $('#productId-'+id_pa).val();
 
-  if(isNaN(qty)){
-    swal("จำนวนไม่ถูกต้อง");
-    return false;
+  if(qty == 0){
+    return 'novalue';
   }
 
   if(qty !== 0){
@@ -99,12 +119,23 @@ function receiveItem(id, id_po, id_zone, id_pa){
       cache:false,
       data: data,
       success:function(rs){
-        setReceived(id_pa, qty);
+        if(rs == 'success'){
+          setReceived(id_pa, qty);
+          }else{
+            swal({
+              title:'Error!',
+              text:'พบข้อผิดพลาดระหว่างการติดต่อกับ SERVER',
+              type:'error'
+            });
+
+            return false;
+          }
       }
     });
   }else{
     setReceived(id_pa, qty);
   }
+  return true;
 }
 
 

@@ -629,7 +629,7 @@ else :
 				$where .= "AND (date_add BETWEEN '".$from." 00:00:00' AND '".$to." 23:59:59')";
 			endif;
 		endif;
-		$where .= " ORDER BY date_add DESC";
+		$where .= " ORDER BY reference DESC";
 
 ?>
 
