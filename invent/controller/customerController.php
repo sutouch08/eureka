@@ -14,6 +14,39 @@ if(isset($_GET['getSaleIdByCustomer']))
 
 
 
+if(isset($_GET['getSaleCustomer']) && isset($_GET['id_sale']))
+{
+	$txt = $_REQUEST['term'];
+	$qr  = "SELECT id_customer, first_name, last_name, company ";
+	$qr .= "FROM tbl_customer ";
+	$qr .= "WHERE id_sale = ".$_GET['id_sale']." ";
+	$qr .= "AND (customer_code LIKE '%".$txt."%' OR first_name LIKE '%".$txt."%' OR last_name LIKE '%".$txt."%' OR company LIKE '%".$txt."%')";
+	$qr .= "LIMIT 20";
+	$qs = dbQuery($qr);
+	if(dbNumRows($qs) > 0)
+	{
+		$ds  = array();
+		while($rs = dbFetchObject($qs))
+		{
+			if($rs->company == '')
+			{
+				$ds[] = $rs->company.' | '.$rs->id_customer;
+			}
+			else
+			{
+				$ds[] = $rs->first_name.' '.$rs->last_name.' | '.$rs->id_customer;
+			}
+		}
+
+		echo json_encode($ds);
+	}
+	else
+	{
+		echo json_encode(array('nodata'));
+	}
+}
+
+
 
 if(isset($_GET['getCustomer']))
 {

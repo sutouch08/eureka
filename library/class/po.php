@@ -212,7 +212,10 @@ public function getPoBacklog($id_po)
 	$qr .= "FROM tbl_po_detail AS po ";
 	$qr .= "LEFT JOIN tbl_product_attribute AS pd ON po.id_product_attribute = pd.id_product_attribute ";
 	$qr .= "LEFT JOIN tbl_product AS pr ON pd.id_product = pr.id_product ";
+	$qr .= "LEFT JOIN tbl_color AS co ON pd.id_color = co.id_color ";
+	$qr .= "LEFT JOIN tbl_size AS si ON pd.id_size = si.id_size ";
 	$qr .= "WHERE po.id_po = ".$id_po." ";
+	$qr .= "ORDER BY co.color_code ASC, si.position ASC";
 	//$qr .= "AND po.valid = 0";
 	//echo $qr;
 

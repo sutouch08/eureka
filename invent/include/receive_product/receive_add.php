@@ -4,6 +4,7 @@
   <?php
   $rd = new receive_product($_GET['id_receive_product']);
   $po = new po();
+  $sup = new supplier($rd->id_supplier);
   $details = $rd->getDetails($rd->id_receive_product);
   $qs = dbNumRows($details) > 0 ? $details : $po->getPoBacklog($rd->id_po);
 
@@ -39,6 +40,16 @@
       <label>วันที่</label>
       <input type="text" class="form-control input-sm text-center" id="date_add" value="<?php echo thaiDate($rd->date_add); ?>" disabled />
     </div>
+
+    <div class="col-sm-1 col-1-harf padding-5">
+      <label>รหัสผู้จำหน่าย</label>
+      <input type="text" class="form-control input-sm" id="supCode" value="<?php echo $sup->code; ?>" disabled />
+    </div>
+    <div class="col-sm-3 col-3-harf padding-5">
+      <label>ชื่อผู้จำหน่าย</label>
+      <input type="text" class="form-control input-sm" id="supName" value="<?php echo $sup->name; ?>" disabled />
+    </div>
+
     <div class="col-sm-1 col-1-harf padding-5">
       <label class="display-block">ใบสั่งซื้อ</label>
       <input type="text" class="form-control input-sm text-center" id="po" value="<?php echo $rd->po_reference; ?>" disabled />
@@ -51,7 +62,7 @@
       <label class="display-block">ใบส่งสินค้า</label>
       <input type="text" class="form-control input-sm text-center" id="invoice" value="<?php echo $rd->invoice; ?>" disabled />
     </div>
-    <div class="col-sm-4 padding-5">
+    <div class="col-sm-6 padding-5 first">
       <label class="display-block">หมายเหตุ</label>
       <input type="text" class="form-control input-sm text-center" id="remark" value="<?php echo $rd->remark; ?>" disabled />
     </div>
@@ -66,6 +77,7 @@
 
     <input type="hidden" id="id_receive_product" value="<?php echo $rd->id_receive_product; ?>" />
     <input type="hidden" id="id_po" value="<?php echo $rd->id_po; ?>" />
+    <input type="hidden" id="id_supplier" value="<?php echo $sup->id; ?>" /> <!-- id_supplier -->
   </div><!--/row-->
 
   <?php

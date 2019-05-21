@@ -145,22 +145,45 @@ if( isset( $_REQUEST['term'] ) && isset( $_GET['get_active_po'] ) )
 {
 	if( $_REQUEST['term'] == "*")
 	{
-		$qs = dbQuery("SELECT id_po, reference, name FROM tbl_po JOIN tbl_supplier ON tbl_po.id_supplier = tbl_supplier.id WHERE tbl_po.status != 0 AND tbl_po.valid = 0");
-	}else{
-		$qs = dbQuery("SELECT id_po, reference, name FROM tbl_po JOIN tbl_supplier ON tbl_po.id_supplier = tbl_supplier.id WHERE (reference LIKE '%".$_REQUEST['term']."%' OR name LIKE '%".$_REQUEST['term']."%') AND tbl_po.status != 0 AND tbl_po.valid = 0");
+		$qr  = "SELECT po.id_po, po.reference, po.id_supplier, sp.name ";
+		$qr .= "FROM tbl_po AS po ";
+		$qr .= "JOIN tbl_supplier AS sp ON po.id_supplier = sp.id ";
+		$qr .= "WHERE po.status != 0 ";
+		$qr .= "AND po.valid = 0";
+
+		$qs = dbQuery($qr);
 	}
+	else
+	{
+		$qr  = "SELECT po.id_po, po.reference, po.id_supplier, sp.name ";
+		$qr .= "FROM tbl_po AS po ";
+		$qr .= "JOIN tbl_supplier AS sp ON po.id_supplier = sp.id ";
+		$qr .= "WHERE po.status != 0 ";
+		$qr .= "AND po.valid = 0 ";
+		$qr .= "AND (reference LIKE '%".$_REQUEST['term']."%' OR name LIKE '%".$_REQUEST['term']."%')";
+
+		$qs = dbQuery($qr);
+	}
+
 	$data = array();
+
 	if( dbNumRows($qs) > 0 )
 	{
 		while( $rs = dbFetchArray($qs) )
 		{
-			$data[] = $rs['id_po']." | ".$rs['reference']." | ".$rs['name'];
+			$data[] = $rs['reference']." | ".$rs['name']." | ".$rs['id_po']." | ".$rs['id_supplier'];
 		}
-	}else{
+	}
+	else
+	{
 		$data[] = "ไม่พบข้อมูล";
 	}
+
 	echo json_encode($data);
 }
+
+
+
 
 /************************* Supplier Code And Name  ***************/
 
@@ -507,6 +530,76 @@ if( isset($_REQUEST['term']) && isset($_GET['get_support_employee_id']) )
 	}
 	echo json_encode($data);
 }
+
+
+if(isset($_GET['getZoneCode']) && isset($_REQUEST['term']))
+{
+	$txt = $_REQUEST['term'];
+
+	if($txt == '*')
+	{
+		$qr = "SELECT * FROM tbl_zone LIMIT 50";
+	}
+	else
+	{
+		$qr = "SELECT * FROM tbl_zone WHERE barcode_zone LIKE '%".$txt."%' LIMIT 50";
+	}
+
+	$qs = dbQuery($qr);
+
+	$ds = array();
+
+	if(dbNumRows($qs) > 0)
+	{
+		while($rs = dbFetchObject($qs))
+		{
+			$ds[] = $rs->barcode_zone.' | '.$rs->zone_name.' | '.$rs->id_zone;
+		}
+	}
+	else
+	{
+		$ds[] = 'Not found';
+	}
+
+	echo json_encode($ds);
+}
+
+
+
+if(isset($_GET['getZoneName']) && isset($_REQUEST['term']))
+{
+	$txt = $_REQUEST['term'];
+
+	if($txt == '*')
+	{
+		$qr = "SELECT * FROM tbl_zone LIMIT 50";
+	}
+	else
+	{
+		$qr = "SELECT * FROM tbl_zone WHERE zone_name LIKE '%".$txt."%' LIMIT 50";
+	}
+
+	$qs = dbQuery($qr);
+
+	$ds = array();
+
+	if(dbNumRows($qs) > 0)
+	{
+		while($rs = dbFetchObject($qs))
+		{
+			$ds[] = $rs->barcode_zone.' | '.$rs->zone_name.' | '.$rs->id_zone;
+		}
+	}
+	else
+	{
+		$ds[] = 'Not found';
+	}
+
+	echo json_encode($ds);
+}
+
+
+
 
 /********************************* ชื่อและไอดีโซน *************************************/
 if( isset($_GET['get_zone_name']) && isset($_REQUEST['term']) )

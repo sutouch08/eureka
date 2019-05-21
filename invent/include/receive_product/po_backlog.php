@@ -11,7 +11,6 @@
       <td class="text-center middle no"><?php echo $no; ?></td>
       <td class="middle"><?php echo $rs->reference; ?></td>
       <td class="middle"><?php echo $rs->product_name; ?></td>
-      <td class="middle text-center"><?php echo number($qty); ?></td>
       <td class="middle text-center">
         <input type="number" class="form-control input-sm text-center receive-box" id="receive-<?php echo $id_pa; ?>" value="<?php //echo $qty; ?>" />
         <span class="hide" id="label-<?php echo $id_pa; ?>"><?php echo $qty; ?></span>

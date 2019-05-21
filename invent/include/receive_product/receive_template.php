@@ -15,3 +15,18 @@
 </tr>
 {{/each}}
 </script>
+
+
+<script id="po-template" type="text/x-handlebarsTemplate">
+{{#each this}}
+<tr id="row-{{id_pa}}" class="item-row">
+  <td class="text-center middle no">{{no}}</td>
+  <td class="middle">{{pdCode}}</td>
+  <td class="middle">{{pdName}}</td>
+  <td class="middle text-center">{{qty}}</td>
+  <td class="middle text-center">
+    <input type="number" class="form-control input-sm text-center receive_qty" id="receive-{{id_pd}}-{{id_pa}}" value="" />
+  </td>
+</tr>
+{{/each}}
+</script>

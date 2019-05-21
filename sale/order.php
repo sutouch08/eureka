@@ -16,10 +16,34 @@
 	}
 ?>
 <?php
-
-if(isset($_GET['id_category'])){ $id_cate = $_GET['id_category']; }
+if(isset($_GET['id_category']))
+{
+	$id_cate = $_GET['id_category'];
+}
 ?>
-<div class='modal fade' id='customer_change' tabindex='-1' role='dialog' aria-labelledby='myModalLabel' aria-hidden='true'>
+<form id="customerForm" action ="controller/orderController.php?new=y&id_sale=<?php echo $id_sale;?>&content=order" method='post'>
+<div class="modal fade" id="customer_change" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-dialog" style="width:400px;">
+		<div class="modal-content">
+		  <div class="modal-header">
+			<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+			<h4 class="modal-title" id="myModalLabel" style="text-align:center;">เลือกลูกค้า</h4>
+		 </div>
+		 <div class="modal-body">
+			<input type="text" name="customerName" id="customerName" class="form-control input-sm" placeholder="เลือกลูกค้า" />
+			<input type="hidden" name="id_customer" id="id_customer" />
+			<input type="hidden" name="id_cart" value="<?php echo $id_cart; ?>" />
+			<input type="hidden" name="id_sale" value="<?php echo $id_sale; ?>" />
+		 </div>
+		<div class="modal-footer">
+			<button type="button" class="btn btn-default" data-dismiss="modal">ปิด</button>
+			<button type="button" class="btn btn-primary" onclick="setCustomer()">ตกลง</button>
+		</div>
+	</div>
+ </div>
+</div>
+</form>
+<!-- <div class='modal fade' id='customer_change' tabindex='-1' role='dialog' aria-labelledby='myModalLabel' aria-hidden='true'>
 	<div class='modal-dialog' style='width:300px;'>
 		<div class='modal-content'>
 		  <div class='modal-header'>
@@ -30,10 +54,10 @@ if(isset($_GET['id_category'])){ $id_cate = $_GET['id_category']; }
 		 <form action ="controller/orderController.php?new=y&id_sale=<?php echo $id_sale;?>&content=order" method='post'>
 
            <select name='id_customer' id='id_customer' class='form-control input-sm input-sx'>
-		   		<?php customerList( getSaleId( $_COOKIE['user_id'] ) ); ?>
+		   		<?php //customerList( getSaleId( $_COOKIE['user_id'] ) ); ?>
            </select>
 
-		<input type='hidden' name='id_cart' value='<?php echo $id_cart; ?>'>
+		<input type='hidden' name='id_cart' value='<?php //echo $id_cart; ?>'>
 
 		 </div>
 		<div class='modal-footer'>
@@ -42,7 +66,7 @@ if(isset($_GET['id_category'])){ $id_cate = $_GET['id_category']; }
 		</div>
 	</div>
  </div>
-</div>
+</div> -->
 
 		<button data-toggle='modal' data-target='#order_grid' id='btn_toggle' style='display:none;'>toggle</button>
 
@@ -159,36 +183,80 @@ if(isset($_GET['id_category'])){ $id_cate = $_GET['id_category']; }
 	</div>
 </div>
 <script>
-	$("#search-text").bind("enterKey",function(){
+
+$('#customerName').autocomplete({
+	source:'../invent/controller/customerController.php?getSaleCustomer&id_sale=<?php echo $id_sale; ?>',
+	autoFocus:true,
+	close:function(event,ui){
+		var data = $(this).val();
+		var arr = data.split(' | ');
+		if(arr.length == 2){
+			$('#id_customer').val(arr[1]);
+			$(this).val(arr[0]);
+		}else{
+			$('#id_customer').val('');
+			$(this).val('');
+		}
+	}
+});
+
+
+
+function setCustomer(){
+	var id_customer = $('#id_customer').val();
+	var id_sale = $('#id_sale').val();
+	var id_cart = $('#id_cart').val();
+
+	if(id_customer == ""){
+		swal("ชื่อลูกค้าไม่ถูกต้อง");
+		return false;
+	}
+
+	$('#customerForm').submit();
+}
+
+
+$("#search-text").bind("enterKey",function(){
 	if($("#search-text").val() != ""){
 		$("#search-btn").click();
 	}
 });
+
+
+
 $("#search-text").keyup(function(e){
-    if(e.keyCode == 13)
-    {
+    if(e.keyCode == 13){
         $(this).trigger("enterKey");
     }
 });
+
+
+
 $("#search-btn").click(function(e) {
     var query_text = $("#search-text").val();
 	var id_customer = $("#id_customer").val();
 	if(query_text !=""){
-	$.ajax({
-		url:"controller/orderController.php?text="+query_text+"&id_customer="+id_customer , type: "GET", cache:false,
-		success: function(result){
-			$("#product_grid").html(result);
-		}
-	});
+		$.ajax({
+			url:"controller/orderController.php?text="+query_text+"&id_customer="+id_customer,
+			type: "GET",
+			cache:false,
+			success: function(result){
+				$("#product_grid").html(result);
+			}
+		});
 	}
 });
+
+
+
 function getData(id_product){
 	var id_cus = $("#id_customer").val();
 	$("#id_product").val(id_product);
 	$.ajax({
 		url:"../invent/controller/orderController.php?getData&id_product="+id_product+"&id_customer="+id_cus,
-		type:"GET", cache:false,
-		success: function(dataset){
+		type:"GET",
+		cache:false,
+		success:function(dataset){
 			if(dataset !=""){
 				var arr = dataset.split("|");
 				var data = arr[0];
@@ -204,30 +272,25 @@ function getData(id_product){
 		}
 	});
 }
-/*	function submit_product(){
-		var id_product = $("#id_product").val();
-		if(id_product != ""){
-			$("#order_form").submit();
+
+
+function submit_product(){
+	$.ajax({
+		url: "controller/orderController.php?add_to_cart",
+		type:"POST",
+		data: $("#order_form").serialize(),
+		success: function(msg){
+			$("#modal_title").html('');
+			$("#modal_body").html('');
+			$("#order_grid").hide();
+			reload_page();
 		}
-	}*/
-
-	function submit_product(){
-		$.ajax({
-			url: "controller/orderController.php?add_to_cart",
-			type:"POST",
-			data: $("#order_form").serialize(),
-			success: function(msg){
-				$("#modal_title").html('');
-				$("#modal_body").html('');
-				$("#order_grid").hide();
-				reload_page();
-			}
-		});
-	}
+	});
+}
 
 
-	function reload_page(){
-		location.reload();
-	}
+function reload_page(){
+	location.reload();
+}
 
 </script>

@@ -1,54 +1,88 @@
 function saveEdit(){
   var id = $('#id_receive_product').val();
+  var dateAdd = $('#date_add').val();
+
+  var id_sup = $('#id_supplier').val();
+  var supCode = $('#supCode').val();
+  var supName = $('#supName').val();
+
+
   var id_po = $('#id_po').val();
+  var poCode = $('#po').val();
+
+  var invoice = $('#invoice').val();
+
   var id_zone = $('#id_zone').val();
-  var unSaveItem = $('.receive-box').length; //--- รายการที่ยังไม่บันทึก
-  var savedItem = $('.received-item').length;
-  var max = unSaveItem + savedItem;
-  var total = 0;
-  if(isNaN(parseInt(id_zone))){
+  var zoneCode = $('#zone-code').val();
+  var zoneName = $('#zone-box').val();
+
+  var remark = $('#remark').val();
+
+  if(!isDate(dateAdd)){
+    swal('วันที่ไม่ถูกต้อง');
+    return false;
+  }
+
+  if(id_sup == '' || supCode.length == 0 || supName.length == 0){
+    swal('ผู้ขายไม่ถูกต้อง');
+    return false;
+  }
+
+  if((id_po < 1 && poCode.length > 0) || (id_po > 0 && poCode.length == 0)){
+    swal('ใบสั่งซื้อไม่ถูกต้อง');
+    return false;
+  }
+
+
+  if(id_zone == '' || zoneCode.length == 0 || zoneName.length == 0 ){
     swal("โซนไม่ถูกต้อง");
     return false;
   }
 
-  if(max > 0){
 
-    $('#btn-save').attr('disabled', 'disabled');
+  $('#btn-save').attr('disabled', 'disabled');
 
-    $('#btn-change-zone').attr('disabled', 'disabled');
+  load_in();
 
-    load_in();
+  $.ajax({
+    url:'controller/receiveProductController.php?saveReceive',
+    type:'POST',
+    cache:false,
+    data:{
+      'id_receive_product' : id,
+      'id_supplier' : id_sup,
+      'invoice' : invoice,
+      'po_reference' : poCode,
+      'id_po' : id_po,
+      'id_zone' : id_zone,
+      'date_add' : dateAdd,
+      'remark' : remark
+    },
+    success:function(rs){
+      load_out();
+      var rs = $.trim(rs);
+      if(rs == 'success'){
+        swal({
+          title:'Saved',
+          text:'บันทึกเอกสารเรียบร้อยแล้ว',
+          type:'success',
+          timer:1000
+        });
 
-    $('.receive-box').each(function(index){
-      let arr = $(this).attr('id').split('-');
-      let id_pa = arr[1];
-      let res = receiveItem(id, id_po, id_zone, id_pa);
-      if( res === false){
-        $('#btn-save').removeAttr('disabled');
-        $('#btn-change-zone').removeAttr('disabled');
-        return false;
-      }else if(res === true){
-        total++;
-        if(total == unSaveItem){
-          review();
-        }
+        setTimeout(function(){
+          window.location.reload();
+        }, 1500);
+      }else{
+        swal({
+          title:'Error!',
+          text:rs,
+          type:'error'
+        });
       }
-    });
-
-    load_out();
-    if(total == 0){
-      $('#btn-save').removeAttr('disabled');
-      $('#btn-change-zone').removeAttr('disabled');
-       swal('กรุณาระบุจำนวนที่จะรับเข้า');
-       return false;
-    }else{
-      setTimeout(function(){
-        review();
-      },1500);
     }
-
-  }
+  });
 }
+//--- end saveEdit
 
 
 
@@ -61,6 +95,39 @@ function updateReceiveProduct(){
   var remark = $('#remark').val();
   var invoice = $('#invoice').val();
   var date_add = $('#date_add').val();
+  var id_supplier = $('#id_supplier').val();
+  var supCode = $('#supCode').val();
+  var supName = $('#supName').val();
+  var id_zone = $('#id_zone').val();
+  var zoneCode = $('#zone-code').val();
+  var zoneName = $('#zone-box').val();
+
+  if(po.length > 0 && id_po < 1 ){
+    swal('ใบสั่งซื้อไม่ถูกต้อง');
+    return false;
+  }
+
+  if(po.length == 0 && id_po > 0){
+    swal('ใบสั่งซื้อไม่ถูกต้อง');
+    return false;
+  }
+
+  if(id_supplier == '' || supCode.length == 0 || supName.length == 0){
+    swal('ชื่อผู้ขายไม่ถูกต้อง');
+    return false;
+  }
+
+  if(id_zone == '' || zoneCode.length == 0 || zoneName.length == 0)
+  {
+    swal('โซนไม่ถูกต้อง');
+    return false;
+  }
+
+  if(!isDate(date_add)){
+    swal('วันที่ไม่ถูกต้อง');
+    return false;
+  }
+
   $.ajax({
     url:'controller/receiveProductController.php?updateReceiveProduct',
     type:'POST',
@@ -68,21 +135,35 @@ function updateReceiveProduct(){
     data:{
       'id_receive_product' : id,
       'date_add' : date_add,
+      'id_supplier' : id_supplier,
       'id_po' : id_po,
       'po_reference' : po,
       'invoice' : invoice,
+      'id_zone' : id_zone,
       'remark' : remark
     },
     success:function(rs){
       var rs = $.trim(rs);
       if(rs == 'success'){
-        $('#date_add').attr('disabled', 'disabled');
-        $('#po').attr('disabled', 'disabled');
-        $('#invoice').attr('disabled', 'disabled');
-        $('#remark').attr('disabled', 'disabled');
-        $('#btn-get-po').attr('disabled', 'disabled');
+        $('.input-box').attr('disabled');
         $('#btn-edit').removeClass('hide');
         $('#btn-save-edit').addClass('hide');
+        swal({
+          title:'Success',
+          text:'Update complete',
+          type:'success',
+          timer: 1000
+        });
+
+        setTimeout(function(){
+          window.location.reload();
+        }, 1500);
+      }else{
+        swal({
+          title:'Error!',
+          text:rs,
+          type:'error'
+        });
       }
     }
   });
@@ -91,55 +172,92 @@ function updateReceiveProduct(){
 
 
 
-function receiveItem(id, id_po, id_zone, id_pa){
-  var qty = parseInt($('#receive-'+id_pa).val());
-  if(isNaN(qty) || qty < 0){
-    qty = 0;
-  }
 
-  var id_pd = $('#productId-'+id_pa).val();
+function unSave(){
+  var id = $('#id_receive_product').val();
+  load_in();
+  $.ajax({
+    url:'controller/receiveProductController.php?unSaveRecieved',
+    type:'POST',
+    cache:false,
+    data:{
+      'id_receive_product' : id
+    },
+    success:function(rs){
+      load_out();
+      var rs = $.trim(rs);
+      if(rs === 'success'){
+        swal({
+          title:'Success',
+          type:'success',
+          timer:1000
+        });
 
-  if(qty == 0){
-    return 'novalue';
-  }
-
-  if(qty !== 0){
-    var data = [
-      {"name" : "id_receive_product", "value" : id},
-      {"name" : "id_po", "value" : id_po},
-      {"name" : "id_product", "value" : id_pd},
-      {"name" : "id_product_attribute", "value" : id_pa},
-      {"name" : "qty", "value" : qty},
-      {"name" : "id_zone", "value" : id_zone}
-    ];
-
-    $.ajax({
-      url:'controller/receiveProductController.php?receiveItem',
-      type:'POST',
-      cache:false,
-      data: data,
-      success:function(rs){
-        if(rs == 'success'){
-          setReceived(id_pa, qty);
-          }else{
-            swal({
-              title:'Error!',
-              text:'พบข้อผิดพลาดระหว่างการติดต่อกับ SERVER',
-              type:'error'
-            });
-
-            return false;
-          }
+        setTimeout(function(){
+          window.location.reload();
+        },1500);
+      }else{
+        swal({
+          title:'Error!',
+          text:rs,
+          type:'error'
+        });
       }
-    });
-  }else{
-    setReceived(id_pa, qty);
-  }
-  return true;
+    }
+  });
+
 }
 
 
 
+
+function removeItem(id_pa){
+  var id_receive_product = $('#id_receive_product').val();
+
+  load_in();
+
+  $.ajax({
+    url:'controller/receiveProductController.php?removeItem',
+    type:'POST',
+    cache:false,
+    data:{
+      'id_receive_product' : id_receive_product,
+      'id_product_attribute' : id_pa
+    },
+    success:function(rs){
+      load_out();
+      rs = parseInt(rs);
+      if(rs === 1){
+        $('#row-'+id_pa).remove();
+        updateNo();
+        reCal();
+        swal({
+          title:'Deleted',
+          text:'ลบ 1 รายการเรียบร้อยแล้ว',
+          type:'success',
+          timer:1000
+        });
+      }else{
+        swal({
+          title:'Error!',
+          text:'ลบรายการไม่สำเร็จ',
+          type:'error'
+        });
+      }
+    }
+  });
+}
+
+
+function reCal(){
+  var total = 0;
+  $('.qty').each(function(){
+    var qty = parseInt($(this).text());
+    total += qty;
+  });
+
+  $('#total').text(addCommas(total));
+}
 
 
 function setReceived(id, qty){
@@ -172,63 +290,64 @@ function deleteRow(id){
 
 
 function getEdit(){
-  $('#date_add').removeAttr('disabled');
-  $('#po').removeAttr('disabled');
-  $('#btn-get-po').removeAttr('disabled');
-  $('#invoice').removeAttr('disabled');
-  $('#remark').removeAttr('disabled');
+  $('.input-box').removeAttr('disabled');
   $('#btn-edit').addClass('hide');
   $('#btn-save-edit').removeClass('hide');
 }
 
 
-function getPO(){
-  var id_po = $('#id_po').val();
-  var received = $('.received-item').length;
+$('#date_add').datepicker({
+  dateFormat:'dd-mm-yy'
+});
 
-  if(id_po == ''){
-    return false;
-  }
 
-  if(received > 0){
-    swal({
-      title:'Warning',
-      text:'ไม่สามารถดึงรายการได้เนื่องจากมีรายการที่เก่าค้างอยู่ กรุณาลบรายการที่ค้างอยู่ก่อนดึงใหม่อีกครั้ง',
-      type:'warning'
-    });
 
-    return false;
-  }
 
-  load_in();
 
-  $.ajax({
-    url:'controller/receiveProductController.php?getPoDetail',
-    type:'GET',
-    cache:false,
-    data:{
-      'id_po' : id_po
-    },
-    success:function(rs){
-      load_out();
-      var rs = $.trim(rs);
-      if(isJson(rs))
-      {
-        $('#pre_label').remove();
-        var source = $('#row-template').html();
-        var data = $.parseJSON(rs);
-        var output = $('#result');
 
-        render(source, data, output);
+function clearAll(){
+  swal({
+    title:'Are You Sure ?',
+    text: 'ต้องการลบรายการทั้งหมดหรือไม่?',
+    type:'warning',
+    showCancelButton:true,
+    confirmButtonColor: "#DD6B55",
+		confirmButtonText: 'ใช่ ฉันต้องการลบ',
+		cancelButtonText: 'ยกเลิก',
+		closeOnConfirm: false
+  }, function(){
+      load_in();
+      var id = $('#id_receive_product').val();
+      $.ajax({
+        url:'controller/receiveProductController.php?removeAllItems',
+        type:'GET',
+        cache:false,
+        data:{
+          'id_receive_product' : id
+        },
+        success:function(rs){
+          load_out();
+          var rs = $.trim(rs);
+          if(rs == 'success'){
+            $('#result').html('');
 
-      }else{
-        swal({
-          title:'Error!',
-          text:rs,
-          type:'error'
-        });
-      }
-    }
-  });
+            setTimeout(function(){
+              swal({
+                title:'Deleted',
+                text:'ลบทุกรายการเรียบร้อยแล้ว',
+                type:'success',
+                timer:1000
+              }, 1000);
+            });
+          }else{
+            swal({
+              title:'Error!',
+              text:rs,
+              type:'error'
+            });
+          }
+        }
+      });
 
+  });// swal
 }

@@ -96,7 +96,7 @@ if($fromDate != "" && $toDate != "")
   $where .= "AND date_add <= '".toDate($toDate)."' ";
 }
 
-$where .= "ORDER BY date_add DESC";
+$where .= "ORDER BY reference DESC";
 
 $paginator = new paginator();
 $get_rows = get_rows();
@@ -116,24 +116,25 @@ $qs = dbQuery($qr);
           <th class="width-5 middle text-center">No.</th>
           <th class="width-10 middle">วันที่</th>
           <th class="width-15 middle">เลขที่เอกสาร</th>
-          <th class="width-15 middle">ใบส่งสินค้า</th>
-          <th class="width-15 middle">ใบสั่งซื้อ</th>
-          <th class="width-15 middle">ผู้ขาย</th>
-          <th class="width-10 middle text-center">สถานะ</th>
-          <th class="middle text-right"></th>
+          <th class="width-10 middle">ใบส่งสินค้า</th>
+          <th class="width-10 middle">ใบสั่งซื้อ</th>
+          <th class="middle">ผู้ขาย</th>
+          <th class="width-8 middle text-center">สถานะ</th>
+          <th class="width-15 middle text-right"></th>
         </tr>
       </thead>
       <tbody>
     <?php if(dbNumRows($qs) > 0) : ?>
     <?php   $no = row_no(); ?>
     <?php   while($rs = dbFetchObject($qs)) : ?>
+    <?php     $supplier = new supplier($rs->id_supplier); ?>
       <tr class="font-size-12" id="row-<?php echo $rs->id_receive_product; ?>">
         <td class="middle text-center no"><?php echo $no; ?></td>
         <td class="middle"><?php echo thaiDate($rs->date_add); ?></td>
         <td class="middle"><?php echo $rs->reference; ?></td>
         <td class="middle"><?php echo $rs->invoice; ?></td>
         <td class="middle"><?php echo $rs->po_reference; ?></td>
-        <td class="middle"><?php echo getSupplierNameByPoId($rs->id_po); ?></td>
+        <td class="middle"><?php echo $supplier->name; ?></td>
         <td class="middle text-center">
           <?php if($rs->status != 1) : ?>
             <span class="red">ยังไม่บันทึก</span>
@@ -143,10 +144,15 @@ $qs = dbQuery($qr);
         <?php if($rs->status == 1) : ?>
           <button type="button" class="btn btn-xs btn-primary" onclick="printReceived(<?php echo $rs->id_receive_product; ?>)"><i class="fa fa-print"></i></button>
         <?php endif; ?>
+
+        <?php if($rs->status == 1) : ?>
           <button type="button" class="btn btn-xs btn-info" onclick="viewDetail(<?php echo $rs->id_receive_product; ?>)"><i class="fa fa-eye"></i></button>
+        <?php endif; ?>
+
         <?php if($edit) : ?>
           <button type="button" class="btn btn-xs btn-warning" onclick="goEdit(<?php echo $rs->id_receive_product; ?>)"><i class="fa fa-pencil"></i></button>
         <?php endif; ?>
+
         <?php if($delete) : ?>
           <button type="button" class="btn btn-xs btn-danger" onclick="getDelete('<?php echo $rs->id_receive_product; ?>','<?php echo $rs->reference; ?>')">
             <i class="fa fa-trash"></i>
@@ -168,3 +174,5 @@ $qs = dbQuery($qr);
 
 
 </div><!--/ container -->
+
+<script src="script/receive_product/receive_list.js?token=<?php echo date('YmdH'); ?>"></script>

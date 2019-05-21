@@ -1,7 +1,8 @@
 <?php
 $rd = new receive_product($_GET['id_receive_product']);
 $product = new product();
-$zone = new zone();
+$zone = new zone($rd->id_zone);
+$sup = new supplier($rd->id_supplier);
 $qs = $rd->getDetails($rd->id_receive_product);
 ?>
 <div class="container">
@@ -26,20 +27,39 @@ $qs = $rd->getDetails($rd->id_receive_product);
     </div>
     <div class="col-sm-1 padding-5">
       <label>วันที่</label>
-      <input type="text" class="form-control input-sm text-center" id="date_add" value="<?php echo thaiDate($rd->date_add); ?>" disabled />
+      <input type="text" class="form-control input-sm text-center input-box" id="date_add" value="<?php echo thaiDate($rd->date_add); ?>" disabled />
     </div>
-    <div class="col-sm-2 padding-5">
+    <div class="col-sm-1 col-1-harf padding-5">
+      <label>รหัสผู้จำหน่าย</label>
+      <input type="text" class="form-control input-sm text-center input-box" id="supCode" value="<?php echo $sup->code; ?>" disabled />
+    </div>
+    <div class="col-sm-4 padding-5">
+      <label>ชื่อผู้จำหน่าย</label>
+      <input type="text" class="form-control input-sm input-box" id="supName" value="<?php echo $sup->name; ?>" disabled />
+    </div>
+    <div class="col-sm-1 col-1-harf padding-5">
       <label class="display-block">ใบสั่งซื้อ</label>
-      <input type="text" class="form-control input-sm text-center" id="po" value="<?php echo $rd->po_reference; ?>" disabled />
+      <input type="text" class="form-control input-sm text-center input-box" id="po" value="<?php echo $rd->po_reference; ?>" disabled />
     </div>
-    <div class="col-sm-2 padding-5">
+    <div class="col-sm-2 padding-5 last">
       <label class="display-block">ใบส่งสินค้า</label>
-      <input type="text" class="form-control input-sm text-center" id="invoice" value="<?php echo $rd->invoice; ?>" disabled />
+      <input type="text" class="form-control input-sm text-center input-box" id="invoice" value="<?php echo $rd->invoice; ?>" disabled />
     </div>
-    <div class="col-sm-5 padding-5 last">
+
+    <div class="col-sm-2 padding-5 first">
+      <label>รหัสโซน</label>
+      <input type="text" class="form-control input-sm input-box" id="zone-code" placeholder="ระบุโซนที่จะรับเข้า" value="<?php echo $zone->barcode_zone; ?>"  disabled />
+    </div>
+    <div class="col-sm-3 padding-5">
+      <label>ชื่อโซน</label>
+      <input type="text" class="form-control input-sm input-box" id="zone-box" placeholder="ระบุโซนที่จะรับเข้า" value="<?php echo $zone->name; ?>" disabled/>
+    </div>
+
+    <div class="col-sm-7 padding-5 last">
       <label class="display-block">หมายเหตุ</label>
-      <input type="text" class="form-control input-sm text-center" id="remark" value="<?php echo $rd->remark; ?>" disabled />
+      <input type="text" class="form-control input-sm input-box" id="remark" value="<?php echo $rd->remark; ?>" disabled />
     </div>
+
     <input type="hidden" id="id_receive_product" value="<?php echo $rd->id_receive_product; ?>" />
     <input type="hidden" id="id_po" value="<?php echo $rd->id_po; ?>" />
   </div><!--/row-->

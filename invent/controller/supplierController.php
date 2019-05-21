@@ -5,7 +5,7 @@ require "../function/tools.php";
 
 
 if( isset( $_GET['add_new'] ) )
-{	
+{
 	$qs = dbQuery("INSERT INTO tbl_supplier (code, name, credit_term, active) VALUES ('".$_POST['code']."', '".$_POST['name']."', ".$_POST['credit_term'].", ".$_POST['status'].")");
 	if($qs)
 	{
@@ -15,6 +15,8 @@ if( isset( $_GET['add_new'] ) )
 	}
 	echo $data;
 }
+
+
 
 if( isset( $_GET['update'] ) && isset( $_POST['id'] ) )
 {
@@ -27,6 +29,8 @@ if( isset( $_GET['update'] ) && isset( $_POST['id'] ) )
 	}
 }
 
+
+
 if( isset($_GET['delete']) && isset($_POST['id']) )
 {
 	$rs = "fail";
@@ -37,6 +41,9 @@ if( isset($_GET['delete']) && isset($_POST['id']) )
 	}
 	echo $rs;
 }
+
+
+
 
 if( isset($_GET['check_code']) )
 {
@@ -49,6 +56,9 @@ if( isset($_GET['check_code']) )
 	echo $rs;
 }
 
+
+
+
 if( isset( $_GET['check_duplicate'] ) )
 {
 	$rs = "ok";
@@ -59,6 +69,33 @@ if( isset( $_GET['check_duplicate'] ) )
 	}
 	echo $rs;
 }
+
+
+
+if(isset($_GET['get_supplier']) && isset($_GET['id_supplier']))
+{
+	$qr = "SELECT code, name FROM tbl_supplier ";
+	$qr .= "WHERE id = ".$_GET['id_supplier'];
+
+	$qs = dbQuery($qr);
+
+	if(dbNumRows($qs) == 1)
+	{
+		$rs = dbFetchObject($qs);
+		$data = array(
+							'code' => $rs->code,
+							'name' => $rs->name
+						);
+
+		echo json_encode($data);
+	}
+	else
+	{
+		echo 'not found';
+	}
+}
+
+
 
 if(isset($_GET['clear_filter']))
 {

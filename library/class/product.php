@@ -2317,7 +2317,9 @@ public function po_input_field($id)
 {
 	if($id != "")
 	{
-		$rs = "<td align='center' style='width:70px; vertical-align:middle; padding:5px;'><input type='text' class='form-control input_qty' name='qty[".$id."]' onkeyup='valid_qty($(this))' /></td>";
+		$rs  = '<td align="center" style="width:70pa; vertical-align:middle; padding-5;">';
+		$rs .= '<input type="number" class="form-control input_qty" name="qty['.$id.']" id="qty-'.$id.'" onkeyup="valid_qty($(this))" />';
+		$rs .= '</td>';
 	}
 	else
 	{
@@ -2330,7 +2332,7 @@ public function input_field($id, $qty)
 {
 	if($qty > 0)
 	{
-		$rs = "<td align='center' style='width:70px; vertical-align:middle; padding:5px;'>	<input type='text' class='form-control' name='qty[".$id."]' onkeyup='valid_qty($(this), ".$qty.")' /><center>".number_format($qty)."</center></td>";
+		$rs = "<td align='center' style='width:70px; vertical-align:middle; padding:5px;'>	<input type='number' class='form-control' name='qty[".$id."]' onkeyup='valid_qty($(this), ".$qty.")' /><center>".number_format($qty)."</center></td>";
 	}
 	else
 	{

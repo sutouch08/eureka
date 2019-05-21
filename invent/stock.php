@@ -69,7 +69,7 @@ if($zoneCode != '')
 	$length++;
 }
 
-$where .= "ORDER BY p.date_upd DESC";
+$where .= "ORDER BY p.reference ASC";
 
 if($length == 0)
 {
