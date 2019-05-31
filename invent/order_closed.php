@@ -3,7 +3,7 @@
 	$page_name = "รายการเปิดบิลแล้ว";
 	$id_tab = 20;
 	$id_profile = $_COOKIE['profile_id'];
-    $pm = checkAccess($id_profile, $id_tab);
+  $pm = checkAccess($id_profile, $id_tab);
 	$view = $pm['view'];
 	$add = $pm['add'];
 	$edit = $pm['edit'];
@@ -95,10 +95,13 @@
 			$invoice = getInvoice($id_order);
 ?>
 	  <div class='row'>
-        	<div class='col-lg-2'>	<strong><?php echo $reference; ?></strong></div>
-            <div class="col-lg-4"><strong><?php echo $cus_label . $cus_info; ?></strong></div>
-            <div class="col-lg-6"><strong><p class="pull-right"><?php echo $em_label . $em_info; ?></p></strong> </div>
-        </div>
+      <div class='col-lg-2'>	<strong><?php echo $reference; ?></strong></div>
+      <div class="col-lg-4"><strong><?php echo $cus_label . $cus_info; ?></strong></div>
+      <div class="col-lg-6"><strong><p class="pull-right"><?php echo $em_label . $em_info; ?></p></strong> </div>
+    </div>
+		<input type="hidden" id="id_order" value="<?php echo $order->id_order; ?>" />
+		<input type="hidden" id="id_customer" value="<?php echo $order->id_customer; ?>" />
+
 		<hr style='border-color:#CCC; margin-top: 0px; margin-bottom:15px;' />
 		<div class='row'>
 		<div class='col-lg-12'>
@@ -124,7 +127,7 @@
 						<!--
 						<button type="button" class="btn btn-default btn-sm" onClick="printPackingList(<?php echo $id_order; ?>)"><i class="fa fa-file-text-o"></i> Picking List</button>
 						-->
-            <button type="button" class="btn btn-info btn-sm" onClick="printAddress(<?php echo $id_order; ?>, <?php echo $order->id_customer; ?>)"><i class="fa fa-file-text-o"></i> พิมพ์ใบปะหน้า</button>
+            <button type="button" class="btn btn-info btn-sm" onClick="printInputPages()"><i class="fa fa-file-text-o"></i> พิมพ์ใบปะหน้า</button>
             </p>
             <?php if( $order->payment == 'ออนไลน์' ) : ?>
             	<input type="hidden" name="online" id="online" value="1" />
@@ -474,11 +477,8 @@
 			<div class='modal-content'>
 	  			<div class='modal-header'>
 					<button type='button' class='close' data-dismiss='modal' aria-hidden='true'>&times;</button>
-                    <input type="hidden" id="id_customer"/><input type="hidden" id="id_order" />
 				 </div>
-				 <div class='modal-body' id='info_body'>
-
-                 </div>
+				 <div class='modal-body' id='info_body'></div>
 				 <div class='modal-footer'>
                  	<button type="button" class="btn btn-primary btn-sm" onClick="printSelectAddress()"><i class="fa fa-print"></i> พิมพ์</button>
 				 </div>
@@ -504,7 +504,25 @@
 		</div>
 	</div>
 
+
+<div class='modal fade' id='inputPagesModal' tabindex='-1' role='dialog' aria-labelledby='myModalLabel' aria-hidden='true'>
+	<div class='modal-dialog' style="width:250px;">
+		<div class='modal-content'>
+			<div class='modal-header'>
+				<button type='button' class='close' data-dismiss='modal' aria-hidden='true'>&times;</button>
+				<h4 class='modal-title-site text-center' >ต้องการพิมพ์กี่กล่อง</h4>
+			</div>
+			<div class='modal-body'>
+				<input type="text" class="form-control input-sm" id="input-pages" value="1" />
+				<button type="button" class="btn btn-info btn-sm pull-right top-col" onClick="printAddress()"><i class="fa fa-print"></i> พิมพ์</button>
+			</div>
+			<div class='modal-footer'></div>
+		</div>
+	</div>
+</div>
+
 <script>
+
 function deleteInvoice(id) {
     swal({
         title: 'ต้องการลบ ?',
@@ -520,12 +538,23 @@ function deleteInvoice(id) {
             url: "controller/orderController.php?deleteInvoice",
             type: "POST",
             cache: "false",
-            data: { "id_order": id },
+            data: {
+							"id_order": id
+						},
             success: function(rs) {
                 var rs = $.trim(rs);
                 if (rs == 'success') {
-                    swal({ title: "สำเร็จ", text: "ลบรายการเรียบร้อยแล้ว", timer: 1000, type: "success" });
-					setTimeout(function(){ window.location.reload(); }, 2000);
+                    swal({
+											title: "สำเร็จ",
+											text: "ลบรายการเรียบร้อยแล้ว",
+											timer: 1000,
+											type: "success"
+										});
+
+										setTimeout(function(){
+											window.location.reload();
+										}, 2000);
+
                 } else {
                     swal("ข้อผิดพลาด!!", "ลบรายการไม่สำเร็จ กรุณาลองใหม่อีกครั้ง", "error");
                 }
@@ -533,6 +562,11 @@ function deleteInvoice(id) {
         });
     });
 }
+
+
+
+
+
 function editInvoice(id)
 {
 	var invoice = $.trim($("#invoice_"+id).text());
@@ -543,6 +577,9 @@ function editInvoice(id)
 		$("#input-invoice").focus();
 	});
 }
+
+
+
 
 function updateInvoice()
 {
@@ -570,6 +607,10 @@ function updateInvoice()
 	}
 }
 
+
+
+
+
 $(".invoice").keyup(function(e) {
     if( e.keyCode == 13 )
 	{
@@ -579,6 +620,11 @@ $(".invoice").keyup(function(e) {
 		saveInvoice(name, id_order);
 	}
 });
+
+
+
+
+
 function saveInvoice(name, id)
 {
 	var invoice = $("#"+name).val();
@@ -601,6 +647,9 @@ function saveInvoice(name, id)
 	}
 }
 
+
+
+
 function toggleNoInvoice()
 {
 	if( $("#noInvoice").val() == 0 )
@@ -613,6 +662,9 @@ function toggleNoInvoice()
 	}
 	getSearch();
 }
+
+
+
 
 function toggleDate(type)
 {
@@ -630,6 +682,8 @@ function toggleDate(type)
 }
 
 
+
+
 function toggleOrderType(type, id)
 {
 	if( $("#"+type).val() == 0 ){
@@ -642,16 +696,25 @@ function toggleOrderType(type, id)
 	getSearch();
 }
 
+
+
 $(".filter").keyup(function(e) {
     if( e.keyCode == 13 ){
 		getSearch();
 	}
 });
 
+
+
+
 function viewOrder(id_order)
 {
 	window.location.href = "index.php?content=order_closed&view_detail&id_order="+id_order;
 }
+
+
+
+
 
 function printBill(id_order)
 {
@@ -659,31 +722,52 @@ function printBill(id_order)
 	window.open("controller/billController.php?print_order&id_order="+id_order, "_blank", "width=800, height=900. left="+center+", scrollbars=yes");
 }
 
+
+
+
+
 function printBarcode(id_order)
 {
 	var center = ($(document).width() - 800)/2;
 	window.open("controller/billController.php?print_order_barcode&id_order="+id_order, "_blank", "width=800, height=900. left="+center+", scrollbars=yes");
 }
 
+
+
+
 function printPackingList(id_order)
 {
 	window.open("index.php?content=order_closed&print_packing_list&id_order="+id_order, "_blank");
 }
 
-function printAddress(id_order, id_customer)
+
+
+
+
+function printAddress()
 {
+	var id_order = $('#id_order').val();
+	var id_customer = $('#id_customer').val();
 	if( $("#online").length ){
-		getOnlineAddress(id_order);
+		getOnlineAddress();
 	}else{
-		getAddressForm(id_order, id_customer);
+		getAddressForm();
 	}
 }
 
-function getOnlineAddress(id_order)
-{
+
+
+
+function getOnlineAddress(){
+	var id_order = $('#id_order').val();
+	var pages = $('#input-pages').val();
 	$.ajax({
 		url:"controller/orderController.php?getOnlineAddress",
-		type:"POST", cache:"false", data:{"id_order" : id_order },
+		type:"POST",
+		cache:"false",
+		data:{
+			"id_order" : id_order
+		},
 		success: function(rs){
 			var rs = $.trim(rs);
 			if( rs == 'noaddress' || isNaN( parseInt(rs) ) ){
@@ -694,11 +778,43 @@ function getOnlineAddress(id_order)
 		}
 	});
 }
-function getAddressForm(id_order, id_customer)
+
+
+$('#inputPagesModal').on('shown.bs.modal', function(){
+	$('#input-pages').select();
+});
+
+
+
+
+function printInputPages(){
+	$('#inputPagesModal').modal('show');
+}
+
+
+
+$('#input-pages').keyup(function(e){
+	if(e.keyCode == 13){
+		printAddress();
+	}
+});
+
+function getAddressForm()
 {
+	$('#inputPagesModal').modal('hide');
+
+	var id_order = $('#id_order').val();
+	var id_customer = $('#id_customer').val();
+	var pages = $('#input-pages').val();
+
 	$.ajax({
 		url:"controller/addressController.php?getAddressForm",
-		type:"POST",cache: "false", data:{ "id_order" : id_order, "id_customer" : id_customer },
+		type:"POST",
+		cache:"false",
+		data:{
+			"id_order" : id_order,
+			"id_customer" : id_customer
+		},
 		success: function(rs){
 			var rs = $.trim(rs);
 			if( rs == 'no_address' ){
@@ -717,17 +833,29 @@ function getAddressForm(id_order, id_customer)
 	});
 }
 
+
+
+
 function printPackingSheet(id_order, id_customer)
 {
+	var pages = $('#input-pages').val();
 	var center = ($(document).width() - 800)/2;
-	window.open("controller/addressController.php?printAddressSheet&id_order="+id_order+"&id_customer="+id_customer, "_blank", "width=800, height=900. left="+center+", scrollbars=yes");
+	var url = "controller/addressController.php?printAddressSheet&id_order="+id_order+"&id_customer="+id_customer+"&pages="+pages;
+	window.open(url, "_blank", "width=800, height=900. left="+center+", scrollbars=yes");
 }
+
+
 
 function printOnlineAddress(id_order, id_address)
 {
+	var pages = $('#input-pages').val();
 	var center = ($(document).width() - 800)/2;
-	window.open("controller/addressController.php?printOnlineAddressSheet&id_order="+id_order+"&id_address="+id_address, "_blank", "width=800, height=900. left="+center+", scrollbars=yes");
+	var url = "controller/addressController.php?printOnlineAddressSheet&id_order="+id_order+"&id_address="+id_address+"&pages="+pages;
+	window.open(url, "_blank", "width=800, height=900. left="+center+", scrollbars=yes");
 }
+
+
+
 
 function printSelectAddress()
 {
@@ -735,20 +863,44 @@ function printSelectAddress()
 	var id_cus = $("#id_customer").val();
 	var id_ad =	$('input[name=id_address]:radio:checked').val();
 	var id_sen	= $('input[name=id_sender]:radio:checked').val();
-	if( isNaN(parseInt(id_ad)) ){ swal("กรุณาเลือกที่อยู่", "", "warning"); return false; }
-	if( isNaN(parseInt(id_sen)) ){ swal("กรุณาเลือกขนส่ง", "", "warning"); return false; }
+	var pages = $('#input-pages').val();
+
+	if( isNaN(parseInt(id_ad)) ){
+		swal("กรุณาเลือกที่อยู่", "", "warning");
+		return false;
+	}
+
+	if( isNaN(parseInt(id_sen)) ){
+		swal("กรุณาเลือกขนส่ง", "", "warning");
+		return false;
+	}
+
 	$("#infoModal").modal('hide');
+
 	var center = ($(document).width() - 800)/2;
-	window.open("controller/addressController.php?printAddressSheet&id_order="+id_order+"&id_customer="+id_cus+"&id_address="+id_ad+"&id_sender="+id_sen, "_blank", "width=800, height=900. left="+center+", scrollbars=yes");
+	var url = "controller/addressController.php?printAddressSheet&id_order="+id_order+"&id_customer="+id_cus+"&id_address="+id_ad+"&id_sender="+id_sen+"&pages="+pages;
+	window.open(url, "_blank", "width=800, height=900. left="+center+", scrollbars=yes");
 }
+
+
+
+
 function noAddress()
 {
 	swal("ข้อผิดพลาด", "ไม่พบที่อยู่ของลูกค้า กรุณาตรวจสอบว่าลูกค้ามีที่อยู่ในระบบแล้วหรือยัง", "warning");
 }
+
+
+
+
 function noSender()
 {
 	swal("ไม่พบผู้จัดส่ง", "ไม่พบรายชื่อผู้จัดส่ง กรุณาตรวจสอบว่าลูกค้ามีการกำหนดชื่อผู้จัดส่งในระบบแล้วหรือยัง", "warning");
 }
+
+
+
+
 
 $("#from_date").datepicker({
      dateFormat: 'dd-mm-yy', onClose: function( selectedDate ) {
@@ -760,6 +912,10 @@ $("#from_date").datepicker({
 	   }
      }
  });
+
+
+
+
 $( "#to_date" ).datepicker({
       dateFormat: 'dd-mm-yy',   onClose: function( selectedDate ) {
         $( "#from_date" ).datepicker( "option", "maxDate", selectedDate );
@@ -768,6 +924,9 @@ $( "#to_date" ).datepicker({
 		}
       }
  });
+
+
+
 
 function getSearch()
 {
@@ -780,6 +939,10 @@ function getSearch()
 	}
 	$("#form").submit();
 }
+
+
+
+
 
 function clearFilter()
 {

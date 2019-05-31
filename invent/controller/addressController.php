@@ -103,6 +103,9 @@ if( isset( $_GET['check_sender'] ) && isset( $_GET['sender_name'] ) )
 	echo dbNumRows($qs);
 }
 
+
+
+
 if( isset( $_GET['addNewSender'] ) && isset( $_POST['type'] ) )
 {
 	$name 		= $_POST['name'];
@@ -112,7 +115,11 @@ if( isset( $_GET['addNewSender'] ) && isset( $_POST['type'] ) )
 	$open			= $_POST['open'];
 	$close		= $_POST['close'];
 	$type 		= $_POST['type'] == 'เก็บเงินปลายทาง' ? $_POST['type'] : 'เก็บเงินต้นทาง';
-	$qs = dbQuery("INSERT INTO tbl_sender ( name, address1, address2, phone, open, close, type ) VALUES ( '".$name."', '".$address1."', '".$address2."', '".$phone."', '".$open."', '".$close."', '".$type."')");
+
+	$qr  = "INSERT INTO tbl_sender ( name, address1, address2, phone, open, close, type ) ";
+	$qr .= "VALUES ( '".$name."', '".$address1."', '".$address2."', '".$phone."', '".$open."', '".$close."', '".$type."')";
+
+	$qs = dbQuery($qr);
 	if( $qs )
 	{
 		echo 'success';
@@ -122,6 +129,9 @@ if( isset( $_GET['addNewSender'] ) && isset( $_POST['type'] ) )
 		echo 'fail';
 	}
 }
+
+
+
 
 if( isset( $_GET['updateSender'] ) && isset( $_GET['id_sender'] ) )
 {
@@ -133,7 +143,14 @@ if( isset( $_GET['updateSender'] ) && isset( $_GET['id_sender'] ) )
 	$open			= $_POST['open'];
 	$close		= $_POST['close'];
 	$type 		= $_POST['type'] == 'เก็บเงินปลายทาง' ? $_POST['type'] : 'เก็บเงินต้นทาง';
-	$qs = dbQuery("UPDATE tbl_sender SET name = '".$name."', address1 = '".$address1."', address2 = '".$address2."', phone = '".$phone."', open = '".$open."', close = '".$close."', type = '".$type."' WHERE id_sender = ".$id);
+
+	$qr  = "UPDATE tbl_sender ";
+	$qr .= "SET name = '".$name."', address1 = '".$address1."', ";
+	$qr .= "address2 = '".$address2."', phone = '".$phone."', ";
+	$qr .= "open = '".$open."', close = '".$close."', type = '".$type."' ";
+	$qr .= "WHERE id_sender = ".$id;
+
+	$qs = dbQuery($qr);
 	if( $qs )
 	{
 		echo 'success';
@@ -143,6 +160,9 @@ if( isset( $_GET['updateSender'] ) && isset( $_GET['id_sender'] ) )
 		echo 'fail';
 	}
 }
+
+
+
 
 if( isset( $_GET['deleteSender'] ) && isset( $_GET['id_sender'] ) )
 {
@@ -158,6 +178,9 @@ if( isset( $_GET['deleteSender'] ) && isset( $_GET['id_sender'] ) )
 	}
 }
 
+
+
+
 if( isset( $_GET['deleteTransportCustomer'] ) && isset( $_GET['id_transport'] ) )
 {
 	$id = $_GET['id_transport'];
@@ -172,11 +195,19 @@ if( isset( $_GET['deleteTransportCustomer'] ) && isset( $_GET['id_transport'] ) 
 	}
 }
 
+
+
+
+
 if( isset( $_GET['isTransportCustomerExists'] ) && isset( $_GET['id_customer'] ) )
 {
 	$qs = dbQuery("SELECT id_customer FROM tbl_transport WHERE id_customer = ".$_GET['id_customer']);
 	echo dbNumRows($qs);
 }
+
+
+
+
 
 if( isset( $_GET['insertTransportCustomer'] ) && isset( $_POST['id_customer'] ) )
 {
@@ -195,6 +226,9 @@ if( isset( $_GET['insertTransportCustomer'] ) && isset( $_POST['id_customer'] ) 
 	}
 }
 
+
+
+
 if( isset( $_GET['updateTransportCustomer'] ) && isset( $_GET['id_transport'] ) )
 {
 	$id = $_GET['id_transport'];
@@ -211,6 +245,9 @@ if( isset( $_GET['updateTransportCustomer'] ) && isset( $_GET['id_transport'] ) 
 		echo 'fail';
 	}
 }
+
+
+
 
 if( isset( $_GET['getSenderInfo'] ) && isset( $_GET['id_sender'] ) )
 {
@@ -231,6 +268,10 @@ if( isset( $_GET['getSenderInfo'] ) && isset( $_GET['id_sender'] ) )
 	echo json_encode($data);
 }
 
+
+
+
+
 if( isset( $_GET['countAddress'] ) )
 {
 	$adds = 0;
@@ -241,6 +282,10 @@ if( isset( $_GET['countAddress'] ) )
 	}
 	echo $adds;
 }
+
+
+
+
 
 if( isset( $_GET['getAddressForm'] ) )
 {
@@ -308,29 +353,36 @@ if( isset( $_GET['getAddressForm'] ) )
 	echo $sc;
 }
 
+
+
+
+
+
 if( isset( $_GET['printAddressSheet'] ) && isset( $_GET['id_customer'] ) )
 {
 	$id_customer 	= $_GET['id_customer'];
 	$id_order		= $_GET['id_order'];
-	$reference		= get_order_reference($id_order);
+	$reference	= get_order_reference($id_order);
 	$id_address	= isset( $_GET['id_address'] ) ? $_GET['id_address'] : getIdAddress($id_customer);
-	$id_sender		= isset( $_GET['id_sender'] )  ? $_GET['id_sender'] : getMainSender($id_customer);
-	$sd				= getSender($id_sender);
-	$ad				= getAddress($id_address);
+	$id_sender	= isset( $_GET['id_sender'] )  ? $_GET['id_sender'] : getMainSender($id_customer);
+	$sd					= getSender($id_sender);
+	$ad					= getAddress($id_address);
 	$cusName		= $ad['company'] == '' ? $ad['first_name'].' '.$ad['last_name'] : $ad['company'];
 	$cName			= getConfig('COMPANY_FULL_NAME');
 	$cAddress		= getConfig('COMPANY_ADDRESS');
 	$cPhone			= getConfig('COMPANY_PHONE');
 	/*********  Sender  ***********/
-	$sender			 = '<div class="col-lg-12" style="font-size:18px; padding-top:15px; padding-bottom:30px;">';
+	$sender			 = '<div class="col-lg-12" style="font-size:20px; padding-top:15px; padding-bottom:30px;">';
+	$sender			.= '<span style="display:block; margin-bottom:10px; font-weight:bold;">ผู้ส่ง</span>';
 	$sender			.= '<span style="display:block; margin-bottom:10px;">'.$cName.'</span>';
-	$sender			.= '<span style="width:70%; display:block;">'.$cAddress.' '.getConfig('COMPANY_POST_CODE').'</span>';
+	$sender			.= '<span style="width:80%; display:block;">'.$cAddress.' '.getConfig('COMPANY_POST_CODE').'</span>';
 	$sender			.= '<span style="display:block"> โทร. '.$cPhone.'</span>';
 	$sender			.= '</div>';
 	/********* / Sender *************/
 
 	/*********** Receiver  **********/
-	$receiver		 = '<div class="col-lg-12" style="font-size:18px; padding-left: 250px; padding-top:15px; padding-bottom:40px;">';
+	$receiver		 = '<div class="col-lg-12" style="font-size:40px; padding-left: 100px; padding-top:15px; padding-bottom:40px;">';
+	$receiver		.= '<span style="display:block; margin-bottom:10px; margin-left:-50px; margin-bottom:50px;">ผู้รับ</span>';
 	$receiver		.= '<span style="display:block; margin-bottom:10px;">'.$cusName.'</span>';
 	$receiver		.= '<span style="display:block;">'.$ad['address1'].'</span>';
 	$receiver		.= '<span style="display:block;">'.$ad['address2'].'</span>';
@@ -345,25 +397,32 @@ if( isset( $_GET['printAddressSheet'] ) && isset( $_GET['id_customer'] ) )
 	if( $sd !== FALSE )
 	{
 		$transport	 = '<table style="width:100%; border:0px; margin-left: 30px; position: relative; bottom:1px;">';
-		$transport	.= '<tr style="font-18px;"><td>'. $sd['name'] .'</td></tr>';
-		$transport	.= '<tr style="font-18px;"><td>'. $sd['address1'] .' '.$sd['address2'].'</td></tr>';
-		$transport	.= '<tr style="font-18px;"><td>โทร. '. $sd['phone'] .' เวลาทำการ : '.date('H:i', strtotime($sd['open'])).' - '.date('H:i', strtotime($sd['close'])).' น. - ( '.$sd['type'].')</td></tr>';
+		$transport	.= '<tr style="font-size:20px;"><td>'. $sd['name'] .'</td></tr>';
+		$transport	.= '<tr style="font-size:20px;"><td>'. $sd['address1'] .' '.$sd['address2'].'</td></tr>';
+		$transport	.= '<tr style="font-size:20px;"><td>โทร. '. $sd['phone'] .' เวลาทำการ : '.date('H:i', strtotime($sd['open'])).' - '.date('H:i', strtotime($sd['close'])).' น. - ( '.$sd['type'].')</td></tr>';
 		$transport 	.= '</table>';
 	}
 
 	/*********** / transport **********/
 
-	$boxes 			= 1; //countBoxes($id_order);
-	$total_page		= $boxes <= 1 ? 1 : ($boxes+1)/2;
+	$boxes = isset($_GET['pages']) ? $_GET['pages'] : 1;
+	$total_page		=  $boxes;
 	$Page = '';
 
 	$printer = new printer();
-	$config = array("row" => 16, "header_row" => 0, "footer_row" => 0, "sub_total_row" => 0);
-	$printer->config($config);
+	$config = array(
+								//"row" => 20,
+								"header_row" => 0,
+								"footer_row" => 0,
+								"sub_total_row" => 0,
+								"content_border" => 0
+							);
 
+	$printer->config($config);
 
 	$Page .= $printer->doc_header();
 	$n = 1;
+
 	while($total_page > 0 )
 	{
 		$Page .= $printer->page_start();
@@ -371,7 +430,7 @@ if( isset( $_GET['printAddressSheet'] ) && isset( $_GET['id_customer'] ) )
 		if( $n < ($boxes+1) )
 		{
 			$Page .= $printer->content_start();
-			$Page .= '<table style="width:100%; border:0px;"><tr><td style="width:50%;">';
+			$Page .= '<table style="width:100%; border:0px;"><tr><td style="width:60%;">';
 			$Page .= $sender;
 			$Page .= '</td><td style=" vertical-align:text-top; text-align:right; font-size:18px; padding-top:25px; padding-right:15px;">'.$reference.' : กล่องที่ '.$n.' / '.$boxes.'</td></tr></table>';
 			$Page .= $receiver;
@@ -379,46 +438,46 @@ if( isset( $_GET['printAddressSheet'] ) && isset( $_GET['id_customer'] ) )
 			$Page .= $printer->content_end();
 			$n++;
 		}
-		if( $n < ($boxes+1) )
-		{
-			$Page .= $printer->content_start();
-			$Page .= '<table style="width:100%; border:0px;"><tr><td style="width:50%;">';
-			$Page .= $sender;
-			$Page .= '</td><td style=" vertical-align:text-top; text-align:right; font-size:18px; padding-top:25px; padding-right:15px;">'.$reference.' : กล่องที่ '.$n.' / '.$boxes.'</td></tr></table>';
-			$Page .= $receiver;
-			$Page .= $transport;
-			$Page .= $printer->content_end();
-			$n++;
-		}
+		// if( $n < ($boxes+1) )
+		// {
+		// 	$Page .= $printer->content_start();
+		// 	$Page .= '<table style="width:100%; border:0px;"><tr><td style="width:50%;">';
+		// 	$Page .= $sender;
+		// 	$Page .= '</td><td style=" vertical-align:text-top; text-align:right; font-size:18px; padding-top:25px; padding-right:15px;">'.$reference.' : กล่องที่ '.$n.' / '.$boxes.'</td></tr></table>';
+		// 	$Page .= $receiver;
+		// 	$Page .= $transport;
+		// 	$Page .= $printer->content_end();
+		// 	$n++;
+		// }
 
-		if( $n > $boxes ){
-			if( $n > $boxes && ($n % 2) == 0 )
-			{
-				$Page .= '
-				<style>.table-bordered > tbody > tr > td { border : solid 1px #333 !important;  }</style>
-				<table class="table table-bordered" >
-					<tr style="font-size:10px">
-						<td style="width:8%;">ใบสั่งงาน</td>
-						<td style="width:25%;"><input type="checkbox" style="margin-left:10px; margin-right:5px;"> รับ <input type="checkbox" checked style="margin-left:10px; margin-right:5px;"> ส่ง</td>
-						<td style="width:27%;">วันที่ '.date("d/m/Y").' <input type="checkbox" style="margin-left:10px; margin-right:5px;">เช้า <input type="checkbox" style="margin-left:10px; margin-right:5px;"> บ่าย</td>
-						<td style="width:20%;">จำนวน '.$boxes.' กล่อง</td>
-						<td style="width:20%;">ออเดอร์ :  '.$reference.'</td>
-					</tr>
-					<tr style="font-size:10px;"><td>ขนส่ง</td><td>'.$sd['name'].'</td><td colspan="3">'.$sd['address1'].' '.$sd['address2'].' ('.$sd['phone'].')</td></tr>
-					<tr style="font-size:10px;"><td>ผู้รับ</td><td>'.$cusName.'</td><td colspan="3">'.$ad['address1'].' '.$ad['address2'].' '.$ad['city'].' '.$ad['postcode'].'</td></tr>
-					<tr style="font-size:10px;"><td>ผู้ติดต่อ</td><td>'.$ad['first_name'].'</td><td>โทร. '.$ad['phone'].'</td><td>ผู้สั่งงาน '.$_COOKIE['UserName'].'</td><td>โทร. </td></tr>
-				</table>';
-			}
-			$n++;
+		if( $n > $boxes )
+		{
+			$Page .= '
+			<table class="table table-bordered" style="border:solid 1px #333; position:relative; bottom:-150px;">
+				<tr style="font-size:10px">
+					<td class="width-10 middle text-center">ใบสั่งงาน</td>
+					<td class="width-25 middle text-center><input type="checkbox" style="margin-left:10px; margin-right:5px;"> รับ <input type="checkbox" checked style="margin-left:10px; margin-right:5px;"> ส่ง</td>
+					<td class="width-25 middle text-center">วันที่ '.date("d/m/Y").'<br/> <input type="checkbox" style="margin-left:10px; margin-right:5px;">เช้า <input type="checkbox" style="margin-left:10px; margin-right:5px;"> บ่าย</td>
+					<td class="width-20 middle text-center">จำนวน '.$boxes.' กล่อง</td>
+					<td class="width-20 middle text-center">'.$reference.'</td>
+				</tr>
+				<tr style="font-size:14px;"><td>ขนส่ง</td><td>'.$sd['name'].'</td><td colspan="3">'.$sd['address1'].' '.$sd['address2'].' ('.$sd['phone'].')</td></tr>
+				<tr style="font-size:14px;"><td>ผู้รับ</td><td>'.$cusName.'</td><td colspan="3">'.$ad['address1'].' '.$ad['address2'].' '.$ad['city'].' '.$ad['postcode'].'</td></tr>
+				<tr style="font-size:14px;"><td>ผู้ติดต่อ</td><td>'.$ad['first_name'].'</td><td>โทร. '.$ad['phone'].'</td><td>ผู้สั่งงาน '.$_COOKIE['UserName'].'</td><td>โทร. </td></tr>
+			</table>';
 		}
 
 		$Page .= $printer->page_end();
 
 		$total_page--;
 	}
+
 	$Page .= $printer->doc_footer();
 	echo $Page;
 }
+
+
+
 
 //----------------  พิมพ์ใบปะหน้ากล่อง ในหน้า QC ---------------------//
 if( isset( $_GET['printAddress'] ) && isset( $_GET['id_customer'] ) )

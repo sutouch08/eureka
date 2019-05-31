@@ -1,4 +1,4 @@
-<?php 
+<?php
 	$page_name = "ผู้ให้บริการจัดส่ง";
 	$id_tab = 55;
 	$id_profile = $_COOKIE['profile_id'];
@@ -11,19 +11,19 @@
 	include 'function/date_helper.php';
 	?>
 
-<style> 
-label { margin-top: 10px; } 
-.input-medium { 
+<style>
+label { margin-top: 10px; }
+.input-medium {
 	width: 300px;
 }
 .input-small {
 	width: 150px;
 }
-.input-label { 
+.input-label {
 	margin-top:0px;
 }
 hr { margin-top:5px; margin-bottom:5px; }
-</style>    
+</style>
 <div class="container">
 	<div class="row" style="height:30px;">
         <div class="col-lg-6" style="margin-top:10px;">
@@ -37,23 +37,23 @@ hr { margin-top:5px; margin-bottom:5px; }
 		<?php if( isset( $_GET['add'] ) ) :	?>
         	<?php if( $add ) : ?>
         		<button type="button" class="btn btn-success btn-sm" onClick="save()"><i class="fa fa-save"></i> บันทึก</button>
-			<?php endif; ?>             
-        <?php endif; ?>   
+			<?php endif; ?>
+        <?php endif; ?>
         <?php if( isset( $_GET['edit'] ) && isset( $_GET['id_sender'] ) ) : ?>
             <?php if( $edit ) : ?>
             	<button type="button" class="btn btn-success btn-sm" onClick="saveEdit(<?php echo $_GET['id_sender']; ?>)"><i class="fa fa-save"></i> บันทึก</button>
             <?php endif; ?>
-        <?php endif; ?> 
+        <?php endif; ?>
         <?php if( !isset( $_GET['add'] ) && !isset( $_GET['edit'] ) ) : ?>
         	<?php if( $add ) : ?>
             	<button type="button" class="btn btn-success btn-sm" onClick="addNew()"><i class="fa fa-plus"></i> เพิ่มใหม่</button>
             <?php endif; ?>
-        <?php endif; ?>            
+        <?php endif; ?>
             </p>
-		</div>       
+		</div>
     </div>
     <hr/>
-<?php if( isset( $_GET['add'] ) ) : ?>    
+<?php if( isset( $_GET['add'] ) ) : ?>
 	<div class="row">
 	<form id="addFrom">
         <div class="col-lg-4 col-lg-offset-4">
@@ -182,7 +182,7 @@ hr { margin-top:5px; margin-bottom:5px; }
 </div>
 </form>
 <hr style="margin-top:10px;"/>
-<?php 
+<?php
 	$qr = "WHERE id_sender != 0 ";
 	if( $name_search !='' ){
 		setcookie('name_search', $name_search, time()+3600, '/');
@@ -200,11 +200,11 @@ hr { margin-top:5px; margin-bottom:5px; }
 		setcookie('type_search', $type_search, time()+3600, '/');
 		$qr .= "AND type = '".$type_search."' ";
 	}
-	$qr .= "ORDER BY id_sender DESC";		
+	$qr .= "ORDER BY id_sender DESC";
 	$paginator = new paginator();
 	if(isset($_POST['get_rows'])){$get_rows = $_POST['get_rows'];$paginator->setcookie_rows($get_rows);}else if(isset($_COOKIE['get_rows'])){$get_rows = $_COOKIE['get_rows'];}else{$get_rows = 50;}
 		$paginator->Per_Page("tbl_sender",$qr,$get_rows);
-		
+
 		$Page_Start = $paginator->Page_Start;
 		$Per_Page = $paginator->Per_Page;
 ?>
@@ -226,7 +226,7 @@ hr { margin-top:5px; margin-bottom:5px; }
         <?php $n = 1; ?>
 		<?php while( $rs = dbFetchArray($qs) ) : ?>
         <?php 	$id = $rs['id_sender']; ?>
-        	<tr id="<?php echo $id; ?>" style="font-size:10px;">
+        	<tr id="<?php echo $id; ?>" style="font-size:14px;">
             	<td align="center"><?php echo $n; ?></td>
                 <td><?php echo $rs['name']; ?></td>
                 <td><?php echo $rs['address1'].' '.$rs['address2']; ?></td>
@@ -243,18 +243,18 @@ hr { margin-top:5px; margin-bottom:5px; }
                 </td>
             </tr>
         <?php $n++; ?>
-        <?php endwhile; ?>                 
-        
+        <?php endwhile; ?>
+
         </table>
         <?php $paginator->display($get_rows,"index.php?content=sender"); ?>
     </div>
 </div><!--/ row -->
-<?php endif; ?>    
+<?php endif; ?>
 </div><!--/ Container -->
 <script>
 function getSearch()
 {
-	$("#searchForm").submit();	
+	$("#searchForm").submit();
 }
 function clearFilter()
 {
@@ -263,7 +263,7 @@ function clearFilter()
 		type:"GET", cache:false, success: function(rs){
 			window.location.href = 'index.php?content=sender';
 		}
-	});	
+	});
 }
 
 function deleteRow(id)
@@ -295,13 +295,13 @@ function deleteRow(id)
 						swal("ไม่สำเร็จ", "ลบผู้จัดส่งไม่สำเร็จ กรุณาลองใหม่อีกครั้ง", "error");
 					}
 				}
-			});						
+			});
 	});
 }
 
 function goEdit(id)
 {
-	window.location.href = 'index.php?content=sender&edit=y&id_sender='+id;	
+	window.location.href = 'index.php?content=sender&edit=y&id_sender='+id;
 }
 
 function saveEdit(id)
@@ -314,7 +314,7 @@ function saveEdit(id)
 		success: function(rs){
 			var rs = $.trim(rs);
 			if( rs != '0' ){
-				swal("Error!", "มีผู้จัดส่งชื่อนี้อยู่ในระบบแล้ว", "error");	
+				swal("Error!", "มีผู้จัดส่งชื่อนี้อยู่ในระบบแล้ว", "error");
 			}else{
 				$.ajax({
 					url:"controller/addressController.php?updateSender&id_sender="+id,
@@ -331,7 +331,7 @@ function saveEdit(id)
 				});
 			}
 		}
-	});	
+	});
 }
 
 function save()
@@ -344,7 +344,7 @@ function save()
 		success: function(rs){
 			var rs = $.trim(rs);
 			if( rs != '0' ){
-				swal("Error!", "มีผู้จัดส่งชื่อนี้อยู่ในระบบแล้ว", "error");	
+				swal("Error!", "มีผู้จัดส่งชื่อนี้อยู่ในระบบแล้ว", "error");
 			}else{
 				$.ajax({
 					url:"controller/addressController.php?addNewSender",
@@ -352,15 +352,15 @@ function save()
 					success: function(rs){
 						var rs = $.trim(rs);
 						if( rs == 'success' ){
-							swal({ 
-								title : 'สำเร็จ', 
-								text : 'เพิ่มผู้จัดส่งเสร็จเรียบร้อยแล้ว ต้องการเพิ่มอีกหรือไม่ ?', 
-								type: 'success', 
+							swal({
+								title : 'สำเร็จ',
+								text : 'เพิ่มผู้จัดส่งเสร็จเรียบร้อยแล้ว ต้องการเพิ่มอีกหรือไม่ ?',
+								type: 'success',
 								//confirmButtonColor: "#DD6B55",
 								confirmButtonText: "เพิ่มอีก",
 								cancelButtonText: "ไม่ใช่",
 								closeOnConfirm: true,
-								showCancelButton: true 
+								showCancelButton: true
 								}, function(isConfirm){
 									if( isConfirm ){
 										window.location.href = 'index.php?content=sender&add';
@@ -380,10 +380,10 @@ function save()
 
 function addNew()
 {
-	window.location.href= 'index.php?content=sender&add=y';	
+	window.location.href= 'index.php?content=sender&add=y';
 }
 function goBack()
 {
-	window.location.href = 'index.php?content=sender';	
+	window.location.href = 'index.php?content=sender';
 }
 </script>

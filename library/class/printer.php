@@ -26,9 +26,25 @@ public $header_row	= array();
 
 public $sub_header	= "";
 private $loader = "<script>
-						var load_time;  function load_in(){ $('#xloader').modal('show'); console.log('load_in'); var time = 0;
-						load_time = window.setInterval(function(){ if(time < 90){ time++; }else{ time += 0.01; } $('#preloader').css('width', time+'%');}, 1000); }
-						function load_out(){ $('#xloader').modal('hide'); window.clearInterval(load_time); $('#preloader').css('width', '0%'); console.log('load_out'); }
+						var load_time;
+						function load_in(){
+							$('#xloader').modal('show');
+							var time = 0;
+							load_time = window.setInterval(function(){
+								if(time < 90){
+									time++;
+								}else{
+									time += 0.01;
+								}
+
+								$('#preloader').css('width', time+'%');}, 1000);
+							}
+
+						function load_out(){
+							$('#xloader').modal('hide');
+							window.clearInterval(load_time);
+							$('#preloader').css('width', '0%');
+						}
 						</script>";
 
 
@@ -79,7 +95,7 @@ public function doc_header($pageTitle = 'print pages')
 	$header .= "	<script src='".WEB_ROOT."library/js/jquery.min.js'></script>";
 	$header .= "	<script src='".WEB_ROOT."library/js/jquery-ui-1.10.4.custom.min.js'></script>";
 	$header .= "	<script src='".WEB_ROOT."library/js/bootstrap.min.js'></script> ";
-	$header .= "	<style> .page_layout{ border: solid 1px #AAA; border-radius:5px; 	} @media print{ 	.page_layout{ border: none; } } 	</style>";
+	$header .= "	<style> .page_layout{ border: solid 1px #AAA; } @media print{ 	.page_layout{ border: none; } } 	</style>";
 	$header .= $this->loader;
 	$header .= "	</head>";
 	$header .= "	<body>";
@@ -264,7 +280,13 @@ public function page_start()
 	{
 		$page_break = "";
 	}
-	return "<div class='page_layout' style='width:".$this->page_width."mm; padding-top:5mm; height:".$this->page_height."mm; margin:auto; ".$page_break."'>"; //// page start
+	return "<div class='page_layout'
+							style='width:".$this->page_width."mm;
+							padding-left:5px;
+							padding-right:5px;
+							padding-top:5mm;
+							height:".$this->page_height."mm;
+							margin:auto; ".$page_break."'>"; //// page start
 }
 
 

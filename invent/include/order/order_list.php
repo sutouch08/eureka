@@ -254,7 +254,7 @@ $paginator->display($get_rows,"index.php?content=order");
 <?php			$customer  = $order->payment != 'ออนไลน์' ? $customer_name : ( $online != '' ? $customer_name.' ( '.$online.' )' : $customer_name );	?>
 <?php 		$orderAmount = orderAmount($id) - bill_discount($id) + getDeliveryFee($id) + getServiceFee($id); ?>
 <?php			if( $order->valid != 2 ) : ?>
-    <tr style="color:#FFF; background-color:<?php echo state_color($order->current_state); ?>; font-size:10px;">
+    <tr style="color:#000; background-color:<?php echo state_color($order->current_state); ?>; font-size:14px;">
       <td align="center" style="cursor:pointer;" onclick="viewOrder(<?php echo $id; ?>)"><?php echo $id; ?></td>
       <td style="cursor:pointer;" onclick="viewOrder(<?php echo $id; ?>)"><?php echo $order->reference; ?></td>
       <td style="cursor:pointer;" onclick="viewOrder(<?php echo $id; ?>)"><?php echo $customer; ?></td>
