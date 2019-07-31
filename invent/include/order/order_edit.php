@@ -48,7 +48,9 @@
         <?php if($order->current_state == 5 || $order->current_state == 9 || $order->current_state == 10 || $order->current_state == 11) : ?>
         	<button type="button" class="btn btn-info btn-sm" onclick="check_order(<?php echo $id_order; ?>)"><i class="fa fa-search"></i>&nbsp; ตรวจสอบรายการ</button>
         <?php endif; ?>
+				<?php if($order->order_status == 1) : ?>
 			<button type="button" class="btn btn-success btn-sm" onclick="print_order(<?php echo $id_order; ?>)"><i class="fa fa-print"></i>&nbsp; พิมพ์</button>
+			<?php endif; ?>
         </p>
 	</div>
 </div><!-- /row -->

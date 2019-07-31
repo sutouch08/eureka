@@ -218,7 +218,15 @@
             <hr/>
 
                 <?php if( $id_pd != 0 ) : ?>
-                <?php 	$qs = dbQuery("SELECT * FROM tbl_product_attribute WHERE id_product = ".$id_pd); ?>
+								<?php
+											$qr = "SELECT pd.*, co.color_code, si.size_name FROM tbl_product_attribute AS pd ";
+											$qr .= "LEFT JOIN tbl_color AS co ON pd.id_color = co.id_color ";
+											$qr .= "LEFT JOIN tbl_size AS si ON pd.id_size = si.id_size ";
+											$qr .= "WHERE pd.id_product = ".$id_pd." ";
+											$qr .= "ORDER BY co.color_code ASC, si.position ASC";
+								?>
+
+                <?php 	$qs = dbQuery($qr); ?>
                 <?php	if( dbNumRows($qs) > 0 ) : ?>
                 <div class="row">
                 	<div class="col-sm-12">
