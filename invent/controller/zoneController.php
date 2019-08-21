@@ -22,6 +22,21 @@ if(isset($_GET['getZone']))
 
 
 
+if(isset($_GET['getZoneId']))
+{
+		$code = $_GET['zoneCode'];
+		$zone = new zone();
+		$id = $zone->getId($code);
+		if($id != ""){
+			echo $id;
+		}else{
+			echo "zone not found";
+		}
+}
+
+
+
+
 //********************* ตรวจสอบชื่อซ้ำกันหรือไม่ ก่อนเพิ่มหรือแก้ไข ********************************//
 if(isset($_GET['zone_name'])&&isset($_GET['id_warehouse'])&&isset($_GET['id_zone'])){
 	$zone_name = $_GET['zone_name'];

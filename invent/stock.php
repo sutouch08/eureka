@@ -35,7 +35,7 @@ $zoneCode = getFilter('zoneCode', 'zoneCode', '');
   </div>
   <div class="col-sm-2 padding-5">
     <label>โซน</label>
-    <input type="text" class="form-control input-sm search-box" name="zoneCode" value="<?php echo $zoneCode; ?>" />
+    <input type="text" class="form-control input-sm search-box" name="zoneCode" id="zoneCode" value="<?php echo $zoneCode; ?>" />
   </div>
 
   <div class="col-sm-1 padding-5">
@@ -46,6 +46,12 @@ $zoneCode = getFilter('zoneCode', 'zoneCode', '');
     <label class="display-block not-show">reset</label>
     <button type="button" class="btn btn-sm btn-warning btn-block" onclick="clearFilter()">เคลียร์ตัวกรอง</button>
   </div>
+	<?php if($delete) : ?>
+	<div class="col-sm-1 padding-5">
+		<label class="display-block not-show">Recal</label>
+    <button type="button" class="btn btn-sm btn-info btn-block" onclick="recalStock()">Recal stock</button>
+	</div>
+	<?php endif; ?>
 </div>
 </form>
 

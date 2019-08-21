@@ -1,4 +1,4 @@
-<?php 
+<?php
 	$pageName	= "ปรับปรุงยอดสินค้า";
 	$id_tab 		= 11;
 	$id_profile 	= getCookie('profile_id');
@@ -7,7 +7,7 @@
 	$add 			= $pm['add'];
 	$edit 			= $pm['edit'];
 	$delete 		= $pm['delete'];
-	accessDeny($view); 
+	accessDeny($view);
 	require 'function/adjust_helper.php';
 ?>
 <div class="container">
@@ -23,7 +23,7 @@
             <button type="button" class="btn btn-sm btn-success" onclick="save()"><i class="fa fa-save"></i> บันทึก</button>
             <?php endif; ?>
         <?php endif; ?>
-        
+
         <?php if( ! isset( $_GET['add'] ) && ! isset( $_GET['edit'] ) && $add) : ?>
         	<button type="button" class="btn btn-sm btn-primary" onclick="viewDiff()"><i class="fa fa-list"></i> ยอดต่าง</button>
         	<button type="button" class="btn btn-sm btn-success" onClick="newAdjust()"><i class="fa fa-plus"></i> เพิ่มใหม่</button>
@@ -66,7 +66,7 @@
     	<?php if( $edit ) : ?>
         	<button type="button" class="btn btn-sm btn-warning" id="btn-edit-header" onClick="editHeader()"><i class="fa fa-pencil"></i> แก้ไข</button>
             <button type="button" class="btn btn-sm btn-success hide" id="btn-update-header" onClick="updateHeader()"><i class="fa fa-save"></i> บันทึก</button>
-        <?php endif; ?>        
+        <?php endif; ?>
     <?php endif; ?>
     </div>
     <input type="hidden" name="id_adjust" id="id_adjust" value="<?php echo $id; ?>" />
@@ -104,7 +104,7 @@
         <input type="hidden" name="id_adjust_detail" id="id_adjust_detail" value="" />
         <input type="hidden" name="id_zone" id="id_zone" value="" />
         <input type="hidden" name="id_pa" id="id_pa" value="" />
-        
+
     </div><!--/ row -->
     <hr class="margin-top-15"/>
     <div class="row">
@@ -122,9 +122,11 @@
                     </tr>
                 </thead>
                  <tbody id="result">
-	<?php $qs = dbQuery("SELECT * FROM tbl_adjust_detail WHERE id_adjust = ".$id); ?>           
-    <?php if( dbNumRows($qs) > 0 ) : ?>     
+	<?php $qs = dbQuery("SELECT * FROM tbl_adjust_detail WHERE id_adjust = ".$id); ?>
+    <?php if( dbNumRows($qs) > 0 ) : ?>
     <?php	$n = 1 ?>
+		<?php $total_up = 0; ?>
+		<?php $total_down = 0; ?>
     <?php 	while( $rs = dbFetchObject($qs) ) : ?>
     <?php 		$id_pa = $rs->id_product_attribute; ?>
     <?php		$item =  get_product_reference($id_pa); ?>
@@ -152,15 +154,24 @@
                         <td align="right">
                         <?php if( $rs->status_up == 0 ) : ?>
                         	<button type="button" class="btn btn-xs btn-warning" onclick="editAdjustDetail(<?php echo $rs->id_adjust_detail; ?>)"><i class="fa fa-pencil"></i></button>
-                        <?php endif; ?>                        
-                        	<button type="button" class="btn btn-xs btn-danger" onClick="confirmDelete(<?php echo $rs->id_adjust_detail; ?>, '<?php echo $item; ?>')"><i class="fa fa-trash"></i></button>                
+                        <?php endif; ?>
+                        	<button type="button" class="btn btn-xs btn-danger" onClick="confirmDelete(<?php echo $rs->id_adjust_detail; ?>, '<?php echo $item; ?>')"><i class="fa fa-trash"></i></button>
                         </td>
                     </tr>
-	<?php $n++; ?>                    
-    <?php	endwhile; ?>    
+	<?php
+			$n++;
+			$total_up += $rs->adjust_qty_add;
+			$total_down += $rs->adjust_qty_minus;
+	?>
+    <?php	endwhile; ?>
     <?php endif; ?>
-               
-                
+		               <tr>
+		               	<td colspan="4" class="text-right">รวม</td>
+										<td class="text-center"><?php echo number_format($total_up); ?></td>
+										<td class="text-center"><?php echo number_format($total_down); ?></td>
+										<td></td>
+		               </tr>
+
                 </tbody>
             </table>
         </div><!--/ col-sm-12 -->
@@ -180,7 +191,7 @@
 	$unsave	= $vt === '' ? '' : ($vt == 0 ? 'btn-info' : '');
 	if( isset( $_POST['adj_vt'] ) ){ createCookie('adj_vt', $vt); }
 	$paginator = new paginator();
-	$get_rows = isset( $_POST['get_rows'] ) ? $_POST['get_rows'] : ( getCookie('get_rows') ? getCookie('get_rows') : 50);	
+	$get_rows = isset( $_POST['get_rows'] ) ? $_POST['get_rows'] : ( getCookie('get_rows') ? getCookie('get_rows') : 50);
 ?>
 <form id="searchForm" method="post">
 <div class="row">
@@ -222,17 +233,17 @@
 	if( $adj_no !== '' )
 	{
 		createCookie('adj_no', $adj_no);
-		$where .= "AND adjust_no LIKE '%".$adj_no."%' ";	
+		$where .= "AND adjust_no LIKE '%".$adj_no."%' ";
 	}
 	if( $adj_ref !== '' )
 	{
 		createCookie('adj_ref', $adj_ref);
-		$where .= "AND adjust_reference LIKE '%".$adj_ref."%' ";	
+		$where .= "AND adjust_reference LIKE '%".$adj_ref."%' ";
 	}
 	if( $adj_rm !== '' )
 	{
 		createCookie('adj_rm', $adj_rm);
-		$where .= "AND adjust_note LIKE '%".$adj_rm."%' ";	
+		$where .= "AND adjust_note LIKE '%".$adj_rm."%' ";
 	}
 	if( $vt !== '' )
 	{
@@ -248,10 +259,10 @@
 ?>
 <div class="row">
 	<div class="col-sm-12">
-<?php 
-		$paginator->Per_Page('tbl_adjust', $where, $get_rows);    
+<?php
+		$paginator->Per_Page('tbl_adjust', $where, $get_rows);
 		$paginator->display($get_rows, 'index.php?content=ProductAdjust');
-?>		
+?>
     	<table class="table table-striped" style="border:solid 1px #ccc;">
             <thead>
                 <tr style="font-size:12px;">
@@ -264,7 +275,7 @@
                     <th style="width:10%; text-align:center;">วันที่</th>
                     <th style="width:10%;"></th>
                 </tr>
-            </thead>            
+            </thead>
             <tbody>
 <?php 	$qs = dbQuery("SELECT * FROM tbl_adjust ".$where." LIMIT ".$paginator->Page_Start.", ".$paginator->Per_Page);	?>
 <?php	if( dbNumRows($qs) > 0 ) : ?>
@@ -289,7 +300,7 @@
                 </tr>
                 <?php $n++; ?>
 <?php		endwhile; 	?>
-<?php 	endif; ?>            
+<?php 	endif; ?>
             </tbody>
         </table>
 <?php	echo $paginator->display_pages(); ?>
@@ -331,7 +342,7 @@
 		<button type="button" class="btn btn-xs btn-danger" onClick="confirmDelete({{ id }}, '{{ product }}')"><i class="fa fa-trash"></i></button>
 		</td>
 	</tr>
-{{/each}}	
+{{/each}}
 </script>
 
 <script>

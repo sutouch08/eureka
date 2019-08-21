@@ -303,3 +303,67 @@ function deleteStock(id_stock){
 
 	});
 }
+
+
+
+function recalStock(){
+  var zoneCode = $('#zoneCode').val();
+  if(zoneCode.length == 0){
+    swal('กรุณาระบุรหัสโซน');
+    return false;
+  }
+
+  $.ajax({
+    url:'controller/zoneController.php?getZoneId',
+    type:'GET',
+    cache:false,
+    data:{
+      'zoneCode' : zoneCode
+    },
+    success:function(rs){
+      var rs = $.trim(rs);
+      if(! isNaN(rs)){
+        id_zone = rs;
+        doRecal(id_zone);
+      }else{
+        swal({
+          title:'Error!',
+          text:'รหัสโซนไม่ถูกต้อง',
+          type:'error'
+        });
+      }
+    }
+  });
+}
+
+
+
+function doRecal(id_zone){
+  load_in();
+  $.ajax({
+    url:'controller/stockController.php?recalStockZone',
+    type:'GET',
+    cache:false,
+    data:{
+      'id_zone' : id_zone
+    },
+    success:function(rs){
+      load_out();
+      var rs = $.trim(rs);
+      if(rs == 'success'){
+        swal({
+          title:'Completed',
+          text: 'Recal stock zone completed',
+          type:'success',
+          timer:1000
+        });
+      }else{
+        swal({
+          title:'Error!',
+          text:rs,
+          type:'error'
+        });
+      }
+    }
+  });
+}
