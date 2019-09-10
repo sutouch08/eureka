@@ -123,10 +123,10 @@
                 </thead>
                  <tbody id="result">
 	<?php $qs = dbQuery("SELECT * FROM tbl_adjust_detail WHERE id_adjust = ".$id); ?>
+	<?php $total_up = 0; ?>
+	<?php $total_down = 0; ?>
     <?php if( dbNumRows($qs) > 0 ) : ?>
     <?php	$n = 1 ?>
-		<?php $total_up = 0; ?>
-		<?php $total_down = 0; ?>
     <?php 	while( $rs = dbFetchObject($qs) ) : ?>
     <?php 		$id_pa = $rs->id_product_attribute; ?>
     <?php		$item =  get_product_reference($id_pa); ?>
