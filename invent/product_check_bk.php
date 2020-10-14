@@ -37,8 +37,7 @@
 
 		return 0;
 	}
-
-	$filter = !empty($_GET['pdCode']) ? $_GET['pdCode'] : '';
+	
 	?>
 <div class="container">
 <!-- page place holder -->
@@ -64,52 +63,30 @@
 <form method="post" id="stock_form" name="edit_qty" action="controller/productcheckController.php?editqty=y"   >
 	<div class="col-lg-12">
 		<table class="table table-striped">
-    	<thead>
+        <thead>
         <tr>
-					<th colspan="2">
-						<input type="text" class="form-control input-sm width-40 inline" id="pdCode" name="pdCode" placeholder="กรองรหัสสินค้า" value="<?php echo $filter; ?>">
-						<button type="button" class="btn btn-sm btn-primary width-25" onclick="getSearch()"> กรอง</button>
-						<button type="button" class="btn btn-sm btn-warning width-25" onclick="clearFilter()"> Reset</button>
-					</th>
-					<th colspan="4">โซน <?php echo get_zone($_GET['id_zone']);?> </th>
-				</tr>
-				<tr>
-					<th class="width-5 text-center">No</th>
-					<th style="text-align: left">ชื่อสินค้า</th>
-			    <th width="15%"  style="text-align: center">จำนวนก่อนนับ</th>
-			    <th width="10%" style="text-align: center">จำนวนที่นับจริง</th>
-			    <th width="3%">&nbsp;</th>
-			    <th width="10%" style="text-align: center">ยอดต่าง</th>
-			    <th width="10%">&nbsp;</th>
-				</tr>
-			</thead>
+		<th colspan="5" style="text-align:center">โซน <?php echo get_zone($_GET['id_zone']);?> </th>
+		</tr>
+		<tr>
+		<th style="text-align: left">ชื่อสินค้า</th>
+        <th width="15%"  style="text-align: center">จำนวนก่อนนับ</th>
+        <th width="10%" style="text-align: center">จำนวนที่นับจริง</th>
+        <th width="3%">&nbsp;</th>
+        <th width="10%" style="text-align: center">ยอดต่าง</th>
+        <th width="10%">&nbsp;</th>
+		</tr>
+		</thead>
    <?php if(isset($_GET['saved']) ): ?>
    		<input type="hidden" id="saved" />
    <?php endif; ?>
    <tbody id="item">
-	<?php
-		$qr = "SELECT st.* FROM tbl_stock AS st
-						LEFT JOIN tbl_product_attribute AS pa
-						ON st.id_product_attribute = pa.id_product_attribute
-						WHERE st.id_zone = ".$_GET['id_zone'];
-
-		if(!empty($_GET['pdCode']))
-		{
-			$qr .= " AND pa.reference LIKE '%".$_GET['pdCode']."%'";
-		}
-
-		$qs = dbQuery($qr);
-
-	?>
+	<?php $qs = dbQuery("SELECT * FROM tbl_stock WHERE id_zone = ".$_GET['id_zone']); ?>
 	<?php if(dbNumRows($qs) > 0 ) : ?>
-		<?php  $no = 1; ?>
     <?php 	while($rs = dbFetchArray($qs) ) : ?>
     <?php 		$diff = get_diff($rs['id_product_attribute'], $_GET['id_zone']); ?>
     <?php 		$id = $rs['id_product_attribute']; ?>
     <?php		$count = $rs['qty'] + $diff; ?>
-		<?php		$count = $count < 0 ? $count * -1 : $count; ?>
     	<tr>
-				<td class="text-center"><?php echo $no; ?></td>
         	<td><?php echo get_product_reference($rs['id_product_attribute']); ?></td>
             <td align="center"><?php echo number_format($rs['qty']); ?><input type="hidden" id="qty_<?php echo $id; ?>" name="qty[<?php echo $id; ?>]" value="<?php echo $rs['qty']; ?>" /></td>
             <td align="center">
@@ -131,7 +108,6 @@
                 <?php endif; ?>
            </td>
         </tr>
-				<?php $no++; ?>
     <?php	endwhile; ?>
     <?php else : ?>
     	<tr><td colspan="6" style="text-align:center;"><h4>ไม่มีสินค้าในโซนนี้</h4></td></tr>
@@ -139,7 +115,6 @@
     	</tbody>
     </table>
     <input type="hidden" name="id_zone" id="id_zone" value="<?php echo $_GET['id_zone']; ?>" />
-		<input type="hidden" name="filter" id="filter" value="<?php echo $filter; ?>">
     </div>
     </form>
 </div>
@@ -203,28 +178,6 @@ $(document).ready(function(e) {
 });
 
 
-
-$('#pdCode').keyup(function(e){
-	if(e.keyCode == 13){
-		getSearch();
-	}
-});
-
-
-function getSearch(){
-	var code = $('#pdCode').val();
-	if(code.length > 0){
-		var id_zone = $('#id_zone').val();
-		window.location.href = "index.php?content=ProductCheck&id_zone="+id_zone+"&pdCode="+code;
-	}
-}
-
-
-
-function clearFilter(){
-	var id_zone = $('#id_zone').val();
-	window.location.href = "index.php?content=ProductCheck&id_zone="+id_zone;
-}
 
 
 
@@ -376,9 +329,9 @@ $("#txt_zone").keyup(function(e) {
 	}
 });
 
-// function setFocus(el, time){
-// 		setTimeout(function(){ if( ! $('.form-control').is(':focus') ){ el.focus();}},time);
-// }
+function setFocus(el, time){
+		setTimeout(function(){ if( ! $('.form-control').is(':focus') ){ el.focus();}},time);
+}
 
 $("#txt_zone").focusout(function(){
 	setFocus($("#txt_zone"),1000);

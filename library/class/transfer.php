@@ -10,7 +10,7 @@ class transfer
 	public $date_upd;
 	public $comment;
 	public $error;
-	
+
 	public function __construct($id = "" )
 	{
 		if( $id != "" )
@@ -30,8 +30,8 @@ class transfer
 			}
 		}
 	}
-	
-	
+
+
 	public function add(array $ds)
 	{
 		$sc = FALSE;
@@ -44,7 +44,7 @@ class transfer
 			{
 				$fields 	.= $i == 1 ? $field : ", ".$field;
 				$values	.= $i == 1 ? "'".$value."'" : ", '".$value."'";
-				$i++;	
+				$i++;
 			}
 			$rs = dbQuery("INSERT INTO tbl_tranfer (".$fields.") VALUES (".$values.")");
 			if( $rs === TRUE )
@@ -52,11 +52,11 @@ class transfer
 				$sc = dbInsertId();
 			}
 		}
-		
+
 		return $sc;
 	}
-	
-	
+
+
 	public function update($id, array $ds)
 	{
 		$sc = FALSE;
@@ -67,7 +67,7 @@ class transfer
 			foreach( $ds as $field => $value )
 			{
 				$set .= $i == 1 ? $field ." = '".$value."'" : ", " . $field ." = '" .$value."'";
-				$i++;	
+				$i++;
 			}
 			$sc = dbQuery("UPDATE tbl_tranfer SET ".$set." WHERE id_tranfer = ".$id);
 			if( $sc === FALSE )
@@ -77,14 +77,14 @@ class transfer
 		}
 		return $sc;
 	}
-	
-	
+
+
 	public function delete($id)
 	{
-		return dbQuery("DELETE FROM tbl_tranfer WHERE id_tranfer = ".$id);	
+		return dbQuery("DELETE FROM tbl_tranfer WHERE id_tranfer = ".$id);
 	}
-	
-	
+
+
 	public function addDetail(array $ds)
 	{
 		$sc = FALSE;
@@ -97,7 +97,7 @@ class transfer
 			{
 				$fields 	.= $i == 1 ? $field : ", ".$field;
 				$values	.= $i == 1 ? "'".$value."'" : ", '".$value."'";
-				$i++;	
+				$i++;
 			}
 			$rs = dbQuery("INSERT INTO tbl_tranfer_detail (".$fields.") VALUES (".$values.")");
 			if( $rs === TRUE )
@@ -105,12 +105,12 @@ class transfer
 				$sc = dbInsertId();
 			}
 		}
-		
+
 		return $sc;
 	}
-	
-	
-	
+
+
+
 	public function updateDetail($id, array $ds)
 	{
 		$sc = FALSE;
@@ -124,24 +124,24 @@ class transfer
 		}
 		return $sc;
 	}
-	
+
 	public function deleteDetail($id_tranfer_detail)
 	{
-		return dbQuery("DELETE FROM tbl_tranfer_detail WHERE id_tranfer_detail = ".$id_tranfer_detail);	
+		return dbQuery("DELETE FROM tbl_tranfer_detail WHERE id_tranfer_detail = ".$id_tranfer_detail);
 	}
-	
+
 	public function isExistsDetail(array $ds)
 	{
 		$sc = FALSE;
 		$qs = dbQuery("SELECT id_tranfer_detail FROM tbl_tranfer_detail WHERE id_tranfer = ".$ds['id_tranfer']." AND id_product_attribute = ".$ds['id_product_attribute']." AND id_zone_from = ".$ds['id_zone_from']." AND valid = 0");
-		if( dbNumRows($qs) == 1 ) 
+		if( dbNumRows($qs) == 1 )
 		{
 			list( $sc ) = dbFetchArray($qs);
 		}
 		return $sc;
 	}
-	
-	
+
+
 	public function addTransferTemp(array $ds )
 	{
 		$sc = FALSE;
@@ -154,15 +154,15 @@ class transfer
 			{
 				$fields 	.= $i == 1 ? $field : ", ".$field;
 				$values	.= $i == 1 ? "'".$value."'" : ", '".$value."'";
-				$i++;	
+				$i++;
 			}
 			$sc = dbQuery("INSERT INTO tbl_tranfer_temp (".$fields.") VALUES (".$values.")");
-			
+
 		}
-		
+
 		return $sc;
 	}
-	
+
 	public function updateTransferTemp(array $ds )
 	{
 		$sc = FALSE;
@@ -172,16 +172,16 @@ class transfer
 		}
 		return $sc;
 	}
-	
-	
-	
+
+
+
 	public function deleteTransferTemp($id_tranfer_detail)
 	{
-		return dbQuery("DELETE FROM tbl_tranfer_temp WHERE id_tranfer_detail = ".$id_tranfer_detail);	
+		return dbQuery("DELETE FROM tbl_tranfer_temp WHERE id_tranfer_detail = ".$id_tranfer_detail);
 	}
-	
-	
-	
+
+
+
 	public function updateStock($id_zone, $id_pa, $qty)
 	{
 		$qs = dbQuery("SELECT id_stock FROM tbl_stock WHERE id_zone = ".$id_zone." AND id_product_attribute = ".$id_pa);
@@ -196,16 +196,16 @@ class transfer
 		}
 		return $sc;
 	}
-	
-	
-	
+
+
+
 	public function clearStockZeroZone($id_zone)
 	{
-		return dbQuery("DELETE FROM tbl_stock WHERE id_zone = ".$id_zone." AND qty = 0");	
+		return dbQuery("DELETE FROM tbl_stock WHERE id_zone = ".$id_zone." AND qty = 0");
 	}
-	
-	
-	
+
+
+
 	//-----------------  New Reference --------------//
 	public function getNewReference($date = '')
 	{
@@ -227,16 +227,16 @@ class transfer
 		}
 		return $reference;
 	}
-	
-	
-	
-	
+
+
+
+
 	public function getMoveList($id)
 	{
-		return dbQuery("SELECT * FROM tbl_tranfer_detail WHERE id_tranfer = ".$id);	
+		return dbQuery("SELECT * FROM tbl_tranfer_detail WHERE id_tranfer = ".$id);
 	}
-	
-	
+
+
 	public function hasDetail($id_tranfer)
 	{
 		$sc = FALSE;
@@ -248,8 +248,15 @@ class transfer
 		}
 		return $sc;
 	}
-	
-	
+
+
+	public function getStockInTransferTemp($id_pa)
+	{
+		$qs = dbQuery("SELECT SUM(qty) AS qty FROM tbl_tranfer_temp WHERE id_product_attribute = '".$id_pa."'");
+		list($qty) = dbFetchArray($qs);
+		return is_null($qty) ? 0 : $qty;
+	}
+
 }//---end class
 
 ?>

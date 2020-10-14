@@ -132,11 +132,11 @@ if(isset($_GET['id_category']))
 <div class='row'>
 	<div class='col-lg-12 col-md-12 col-sm-12 col-xs-12' id='product_grid'>
 <?php if(isset($id_cate) ) : ?>
-<?php  	$qr  = "SELECT pd.id_product FROM tbl_product AS pd";
+<?php  	$qr  = "SELECT pd.id_product FROM tbl_product AS pd ";
  				$qr .= "LEFT JOIN tbl_category_product AS cp ON pd.id_product = cp.id_product ";
-				$qr .= "WHERE id_category = ".$id_cate." AND tbl_product.active =1";
+				$qr .= "WHERE id_category = ".$id_cate." AND pd.active = 1";
 ?>
-<?php $sql = dbQuery(""); ?>
+<?php $sql = dbQuery($qr); ?>
 <?php $row = dbNumRows($sql);  ?>
 <?php	if($row>0) :  ?>
 <?php		$i=0;  ?>

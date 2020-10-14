@@ -42,6 +42,14 @@ class cancle_zone
 		return FALSE;
   }
 
+
+  public function getStockInCancle($id_pa)
+  {
+    $qs = dbQuery("SELECT SUM(qty) AS qty FROM tbl_cancle WHERE id_product_attribute = '".$id_pa."'");
+    list($qty) = dbFetchArray($qs);
+    return is_null($qty) ? 0 : $qty;
+  }
+
 } //--- end class
 
 ?>

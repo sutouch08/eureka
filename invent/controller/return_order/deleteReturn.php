@@ -8,7 +8,9 @@ $stock = new stock();
 $product = new product();
 $qs = $cs->getDetails($id);
 
-if(dbNumRows($qs) > 0 && $cs->isSave == 1)
+startTransection();
+
+if(dbNumRows($qs) > 0)
 {
   //-- 1 unsold order
   //-- 2 delete movement
@@ -17,7 +19,7 @@ if(dbNumRows($qs) > 0 && $cs->isSave == 1)
   //--- loop until all detail deleted
   //-- 5 delete document
 
-  startTransection();
+
   while($rs = dbFetchObject($qs))
   {
     if($sc === FALSE)
@@ -64,31 +66,29 @@ if(dbNumRows($qs) > 0 && $cs->isSave == 1)
     }
 
   } //-- endwhile
-
-
-  if($sc === TRUE)
-  {
-    if($cs->delete($cs->id) !== TRUE)
-    {
-      $sc = FALSE;
-      $message = 'ลบเอกสารไม่สำเร็จ';
-    }
-  }
-
-
-  if($sc === TRUE)
-  {
-    commitTransection();
-  }
-  else
-  {
-    dbRollback();
-  }
-
-  endTransection();
 }
 
 
+if($sc === TRUE)
+{
+  if($cs->delete($cs->id) !== TRUE)
+  {
+    $sc = FALSE;
+    $message = 'ลบเอกสารไม่สำเร็จ';
+  }
+}
+
+
+if($sc === TRUE)
+{
+  commitTransection();
+}
+else
+{
+  dbRollback();
+}
+
+endTransection();
 
 echo $sc === TRUE ? 'success' : $message;
 
