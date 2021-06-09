@@ -79,7 +79,7 @@ if( $reference != '')
 if($pdCode != '')
 {
   createCookie('pdCode', $pdCode);
-  $where .= "AND p.reference LIKE '%".$pdCode."%' ";
+  $where .= "AND p.reference LIKE '".$pdCode."%' ";
 	$length++;
 }
 

@@ -15,8 +15,8 @@ if(isset($_GET['getProductStock']) && isset($_GET['searchText']))
 	$qr .= "LEFT JOIN tbl_product AS pd ON pa.id_product = pd.id_product ";
 	$qr .= "LEFT JOIN tbl_color AS co ON pa.id_color = co.id_color ";
 	$qr .= "LEFT JOIN tbl_size AS si ON pa.id_size = si.id_size ";
-	$qr .= "WHERE pa.reference LIKE '%{$txt}%' ";
-	$qr .= "OR pd.product_name LIKE '%{$txt}%' ";
+	$qr .= "WHERE pa.reference LIKE '{$txt}%' ";
+	//$qr .= "OR pd.product_name LIKE '{$txt}%' ";
 	$qr .= "ORDER BY pd.product_code ASC, co.color_code ASC, si.position ASC ";
 	$qr .= "LIMIT 100";
 
@@ -120,7 +120,7 @@ if(isset($_GET['findOrder']) && isset($_GET['searchText']))
 	$qr .= "LEFT JOIN tbl_employee AS em ON o.id_employee = em.id_employee ";
 	$qr .= "LEFT JOIN tbl_customer AS c ON o.id_customer = c.id_customer ";
 	$qr .= "LEFT JOIN tbl_order_state AS s ON o.current_state = s.id_order_state ";
-	$qr .= "WHERE od.product_reference LIKE '%{$txt}%' ";
+	$qr .= "WHERE od.product_reference LIKE '{$txt}%' ";
 	$qr .= "AND o.current_state < 8 ";
 	$qr .= "AND od.valid_detail != 2 ";
 	$qr .= "ORDER BY od.product_reference ASC, o.reference ASC";
